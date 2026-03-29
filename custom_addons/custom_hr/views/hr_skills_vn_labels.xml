@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Resume / Certifications tabs in employee form -->
+    <record id="custom_hr_hr_skills_employee_form_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.employee.form.vn</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_skills.hr_employee_view_form"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='o_employee_left']//separator[1]" position="attributes">
+                <attribute name="string">CV</attribute>
+            </xpath>
+            <xpath expr="//page[@name='certification']" position="attributes">
+                <attribute name="string">Chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='certification_ids']//field[@name='skill_id']" position="attributes">
+                <attribute name="string">Chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='certification_ids']//field[@name='valid_from']" position="attributes">
+                <attribute name="string">Từ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='certification_ids']//field[@name='valid_to']" position="attributes">
+                <attribute name="string">Đến</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Resume tab in public employee -->
+    <record id="custom_hr_hr_skills_employee_public_form_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.employee.public.form.vn</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr_skills.hr_employee_public_view_form_inherit"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='resume']//separator[1]" position="attributes">
+                <attribute name="string">CV</attribute>
+            </xpath>
+            <xpath expr="//page[@name='certification']" position="attributes">
+                <attribute name="string">Chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='certification_ids']//field[@name='skill_id']" position="attributes">
+                <attribute name="string">Chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='certification_ids']//field[@name='valid_from']" position="attributes">
+                <attribute name="string">Từ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='certification_ids']//field[@name='valid_to']" position="attributes">
+                <attribute name="string">Đến</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Resume line form -->
+    <record id="custom_hr_resume_line_form_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.resume.line.form.vn</field>
+        <field name="model">hr.resume.line</field>
+        <field name="inherit_id" ref="hr_skills.resume_line_view_form"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">CV</attribute>
+            </xpath>
+            <xpath expr="//label[@for='name']" position="attributes">
+                <attribute name="string">Tiêu đề</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="placeholder">vd. Odoo Inc.</attribute>
+            </xpath>
+            <xpath expr="//label[@id='date_start_label']" position="attributes">
+                <attribute name="string">Thời gian</attribute>
+            </xpath>
+            <xpath expr="//label[@for='date_start' and not(@id='date_start_label')]" position="attributes">
+                <attribute name="string">Ngày</attribute>
+            </xpath>
+            <xpath expr="//label[@for='duration']" position="attributes">
+                <attribute name="string">Thời lượng</attribute>
+            </xpath>
+            <xpath expr="//span[.//field[@name='duration']]" position="replace">
+                <span>
+                    <field name="duration" style="width: 4ch;"/> giờ
+                </span>
+            </xpath>
+            <xpath expr="//field[@name='description']" position="attributes">
+                <attribute name="placeholder">Mô tả</attribute>
+            </xpath>
+            <xpath expr="//field[@name='external_url']" position="attributes">
+                <attribute name="placeholder">vd. https://duolingo.com/course/xyz</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Resume line list/search labels -->
+    <record id="custom_hr_resume_line_list_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.resume.line.list.vn</field>
+        <field name="model">hr.resume.line</field>
+        <field name="inherit_id" ref="hr_skills.hr_resume_line_list_view"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list[1]" position="attributes">
+                <attribute name="name">Dòng CV</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="string">Tên đào tạo</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="string">Ngày</attribute>
+            </xpath>
+            <xpath expr="//field[@name='course_type']" position="attributes">
+                <attribute name="string">Loại</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_type_id']" position="attributes">
+                <attribute name="string">Mục CV</attribute>
+            </xpath>
+            <xpath expr="//field[@name='duration']" position="attributes">
+                <attribute name="string">Số giờ</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_resume_line_search_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.resume.line.search.vn</field>
+        <field name="model">hr.resume.line</field>
+        <field name="inherit_id" ref="hr_skills.view_resume_lines_filter"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="attributes">
+                <attribute name="string">Dòng CV</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Skills & Certification models -->
+    <record id="custom_hr_skill_level_tree_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.level.tree.vn</field>
+        <field name="model">hr.skill.level</field>
+        <field name="inherit_id" ref="hr_skills.employee_skill_level_view_tree"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="string">Cấp độ kỹ năng</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_skill_type_form_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.type.form.vn</field>
+        <field name="model">hr.skill.type</field>
+        <field name="inherit_id" ref="hr_skills.hr_employee_skill_type_view_form"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Loại kỹ năng</attribute>
+            </xpath>
+            <xpath expr="//label[@for='name']" position="attributes">
+                <attribute name="string">Loại kỹ năng</attribute>
+            </xpath>
+            <xpath expr="//field[@name='skill_ids']/preceding-sibling::group[1]" position="attributes">
+                <attribute name="string">Kỹ năng</attribute>
+            </xpath>
+            <xpath expr="//field[@name='skill_level_ids']/preceding-sibling::group[1]" position="attributes">
+                <attribute name="string">Cấp độ</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_skill_form_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.skill.form.vn</field>
+        <field name="model">hr.skill</field>
+        <field name="inherit_id" ref="hr_skills.hr_skill_view_form"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Kỹ năng</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_employee_skill_form_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.employee.skill.form.vn</field>
+        <field name="model">hr.employee.skill</field>
+        <field name="inherit_id" ref="hr_skills.employee_skill_view_form"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Kỹ năng</attribute>
+            </xpath>
+            <xpath expr="//field[@name='skill_type_id']" position="attributes">
+                <attribute name="string">Nhóm</attribute>
+            </xpath>
+            <xpath expr="//label[@for='valid_from']" position="attributes">
+                <attribute name="string">Thời hạn</attribute>
+            </xpath>
+            <xpath expr="//label[@for='valid_to']" position="attributes">
+                <attribute name="string">Đến</attribute>
+            </xpath>
+            <xpath expr="//field[@name='valid_to']" position="attributes">
+                <attribute name="placeholder">Không thời hạn</attribute>
+            </xpath>
+            <xpath expr="//div[hasclass('alert') and hasclass('alert-warning')]" position="replace">
+                <div class="alert alert-warning ps-3" role="alert">
+                    Ngày kết thúc phải sau ngày bắt đầu.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_employee_skill_list_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.employee.skill.list.vn</field>
+        <field name="model">hr.employee.skill</field>
+        <field name="inherit_id" ref="hr_skills.hr_employee_skill_view_list"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="string">Chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//button[@name='open_hr_employee_skill_modal']" position="attributes">
+                <attribute name="string">Thêm mới</attribute>
+            </xpath>
+            <xpath expr="//field[@name='skill_id']" position="attributes">
+                <attribute name="string">Chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='valid_from']" position="attributes">
+                <attribute name="string">Từ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='valid_to']" position="attributes">
+                <attribute name="string">Đến</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_employee_skill_search_vn" model="ir.ui.view">
+        <field name="name">custom.hr.skills.employee.skill.search.vn</field>
+        <field name="model">hr.employee.skill</field>
+        <field name="inherit_id" ref="hr_skills.hr_employee_skill_view_search"/>
+        <field name="priority" eval="130"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='skill_id']" position="attributes">
+                <attribute name="string">Chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='valid_certification']" position="attributes">
+                <attribute name="string">Chứng chỉ còn hạn</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='group_by_certification']" position="attributes">
+                <attribute name="string">Theo chứng chỉ</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='group_by_type']" position="attributes">
+                <attribute name="string">Theo loại</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='group_by_employee']" position="attributes">
+                <attribute name="string">Theo nhân viên</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Actions & menus -->
+    <record id="hr_skills.hr_resume_type_action" model="ir.actions.act_window">
+        <field name="name">Mục CV</field>
+    </record>
+    <record id="hr_skills.hr_resume_lines_training_action" model="ir.actions.act_window">
+        <field name="name">Lượt đào tạo</field>
+    </record>
+    <record id="hr_skills.hr_skill_type_action" model="ir.actions.act_window">
+        <field name="name">Loại kỹ năng</field>
+    </record>
+    <record id="hr_skills.action_hr_employee_skill_certification" model="ir.actions.act_window">
+        <field name="name">Chứng chỉ</field>
+    </record>
+
+    <record id="hr_skills.menu_human_resources_configuration_resume" model="ir.ui.menu">
+        <field name="name">CV</field>
+    </record>
+    <record id="hr_skills.hr_resume_line_type_menu" model="ir.ui.menu">
+        <field name="name">Mục CV</field>
+    </record>
+    <record id="hr_skills.hr_skill_type_menu" model="ir.ui.menu">
+        <field name="name">Loại kỹ năng</field>
+    </record>
+    <record id="hr_skills.hr_employee_skill_report_menu" model="ir.ui.menu">
+        <field name="name">Kỹ năng</field>
+    </record>
+    <record id="hr_skills.hr_skill_learning_menu" model="ir.ui.menu">
+        <field name="name">Học tập</field>
+    </record>
+    <record id="hr_skills.hr_certification_menu" model="ir.ui.menu">
+        <field name="name">Chứng chỉ</field>
+    </record>
+    <record id="hr_skills.menu_learnings_training_attendances" model="ir.ui.menu">
+        <field name="name">Tham gia đào tạo</field>
+    </record>
+</odoo>

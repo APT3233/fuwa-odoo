@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Core HR: deeper Vietnamese labels in Personal tab -->
+    <record id="custom_hr_employee_vn_labels_personal_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.personal.deep</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='personal_information']//group[.//field[@name='private_email']]" position="attributes">
+                <attribute name="string">Liên hệ cá nhân</attribute>
+            </xpath>
+            <xpath expr="//span[@invisible='is_trusted_bank_account']" position="replace">
+                <span class="text-muted" invisible="is_trusted_bank_account">Chưa xác thực</span>
+            </xpath>
+            <xpath expr="//span[@invisible='not is_trusted_bank_account']" position="replace">
+                <span class="text-success" invisible="not is_trusted_bank_account">Đã xác thực</span>
+            </xpath>
+            <xpath expr="//group[@name='hr_birth_group']" position="attributes">
+                <attribute name="string">Thông tin cá nhân</attribute>
+            </xpath>
+            <xpath expr="//field[@name='place_of_birth']" position="attributes">
+                <attribute name="placeholder">Thành phố</attribute>
+            </xpath>
+            <xpath expr="//field[@name='country_of_birth']" position="attributes">
+                <attribute name="placeholder">Quốc gia</attribute>
+            </xpath>
+            <xpath expr="//field[@name='sex']" position="attributes">
+                <attribute name="string">Giới tính</attribute>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']//group[.//field[@name='emergency_contact']]" position="attributes">
+                <attribute name="string">Liên hệ khẩn cấp</attribute>
+            </xpath>
+            <xpath expr="//field[@name='emergency_contact']" position="attributes">
+                <attribute name="string">Liên hệ</attribute>
+            </xpath>
+            <xpath expr="//field[@name='emergency_phone']" position="attributes">
+                <attribute name="string">Điện thoại</attribute>
+            </xpath>
+            <xpath expr="//group[.//field[@name='visa_no'] and .//field[@name='permit_no']]" position="attributes">
+                <attribute name="string">Visa &amp; Giấy phép lao động</attribute>
+            </xpath>
+            <xpath expr="//label[@for='visa_expire']" position="attributes">
+                <attribute name="string">Hết hạn</attribute>
+            </xpath>
+            <xpath expr="//label[@for='work_permit_expiration_date']" position="attributes">
+                <attribute name="string">Hết hạn</attribute>
+            </xpath>
+            <xpath expr="//field[@name='has_work_permit']" position="attributes">
+                <attribute name="string">Tài liệu</attribute>
+            </xpath>
+            <xpath expr="//group[@name='citizenship']" position="attributes">
+                <attribute name="string">Quốc tịch</attribute>
+            </xpath>
+            <xpath expr="//group[@name='hr_location_group']" position="attributes">
+                <attribute name="string">Địa chỉ</attribute>
+            </xpath>
+            <xpath expr="//label[@for='private_street']" position="attributes">
+                <attribute name="string">Địa chỉ thường trú</attribute>
+            </xpath>
+            <xpath expr="//group[@name='hr_family_group']" position="attributes">
+                <attribute name="string">Gia đình</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- HR Attendance: Monthly Hours label + help -->
+    <record id="custom_hr_employee_vn_labels_attendance_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.attendance.deep</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_attendance.view_employee_form_inherit_hr_attendance"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_last_month_attendances']" position="attributes">
+                <attribute name="help">Giờ làm trong tháng</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_open_last_month_attendances']//span[@class='o_stat_text']" position="replace">
+                <span class="o_stat_text">Giờ làm tháng</span>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OCA: Relatives — đã xử lý trong hr_employee_vn_labels.xml, bỏ duplicate -->
+
+
+    <!-- OCA: Documents stat button + attachment search -->
+    <record id="custom_hr_employee_vn_labels_documents_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.documents.deep</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_employee_document.hr_employee_view_form"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='document_count']" position="attributes">
+                <attribute name="string">Tài liệu</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_employee_vn_labels_documents_public_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.documents.public.deep</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr_employee_document.hr_employee_public_view_form"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='document_count']" position="attributes">
+                <attribute name="string">Tài liệu</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_employee_vn_labels_documents_search_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.documents.search.deep</field>
+        <field name="model">ir.attachment</field>
+        <field name="inherit_id" ref="hr_employee_document.ir_attachment_view_search"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='index_content']" position="attributes">
+                <attribute name="string">Nội dung</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OCA: Medical Examinations (actions + menus) -->
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_act_window" model="ir.actions.act_window">
+        <field name="name">Khám sức khỏe nhân viên</field>
+    </record>
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_menu" model="ir.ui.menu">
+        <field name="name">Khám sức khỏe</field>
+    </record>
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_all" model="ir.ui.menu">
+        <field name="name">Danh sách khám sức khỏe</field>
+    </record>
+    <record id="hr_employee_medical_examination.act_medical_examination_employee" model="ir.actions.act_window">
+        <field name="name">Khám sức khỏe</field>
+    </record>
+    <record id="hr_employee_medical_examination.wizard_generate_medical_examination_act_window" model="ir.actions.act_window">
+        <field name="name">Tạo đợt khám sức khỏe</field>
+    </record>
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_generate_wizard" model="ir.ui.menu">
+        <field name="name">Tạo đợt khám sức khỏe</field>
+    </record>
+
+    <!-- OCA: Medical Examinations stat button -->
+    <record id="custom_hr_employee_vn_labels_medical_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.medical.deep</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_employee_medical_examination.view_employee_form"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='medical_examination_count']" position="attributes">
+                <attribute name="string">Khám sức khỏe</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OCA: Medical Examinations wizard labels -->
+    <record id="custom_hr_employee_vn_labels_medical_wizard_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.medical.wizard.deep</field>
+        <field name="model">wizard.generate.medical.examination</field>
+        <field name="inherit_id" ref="hr_employee_medical_examination.wizard_generate_medical_examination_form_view"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Tạo đợt khám sức khỏe</attribute>
+            </xpath>
+            <xpath expr="//h3/strong" position="replace">
+                <strong>Bộ lọc:</strong>
+            </xpath>
+            <xpath expr="//button[@name='populate']" position="attributes">
+                <attribute name="string">Nạp danh sách</attribute>
+            </xpath>
+            <xpath expr="//page[.//field[@name='employee_ids']]" position="attributes">
+                <attribute name="string">Nhân viên</attribute>
+            </xpath>
+            <xpath expr="//button[@name='create_medical_examinations']" position="attributes">
+                <attribute name="string">Tạo</attribute>
+            </xpath>
+            <xpath expr="//button[@special='cancel']" position="attributes">
+                <attribute name="string">Hủy</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OCA: Medical Examinations form/search labels -->
+    <record id="custom_hr_employee_vn_labels_medical_form_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.medical.form.deep</field>
+        <field name="model">hr.employee.medical.examination</field>
+        <field name="inherit_id" ref="hr_employee_medical_examination.hr_employee_medical_examination_form_view"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='back_to_pending']" position="attributes">
+                <attribute name="string">Đưa về chờ</attribute>
+            </xpath>
+            <xpath expr="//button[@name='to_done']" position="attributes">
+                <attribute name="string">Đánh dấu hoàn thành</attribute>
+            </xpath>
+            <xpath expr="//button[@name='to_cancelled']" position="attributes">
+                <attribute name="string">Đánh dấu hủy</attribute>
+            </xpath>
+            <xpath expr="//button[@name='to_rejected']" position="attributes">
+                <attribute name="string">Đánh dấu từ chối</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="placeholder">Tên nhân viên</attribute>
+            </xpath>
+            <xpath expr="//field[@name='note']/preceding-sibling::separator[1]" position="replace">
+                <separator string="Ghi chú"/>
+            </xpath>
+            <xpath expr="//field[@name='note']" position="attributes">
+                <attribute name="placeholder">Thêm ghi chú...</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_employee_vn_labels_medical_search_deep" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.medical.search.deep</field>
+        <field name="model">hr.employee.medical.examination</field>
+        <field name="inherit_id" ref="hr_employee_medical_examination.hr_employee_medical_examination_search_view"/>
+        <field name="priority" eval="125"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='passed']" position="attributes">
+                <attribute name="string">Đạt</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='failed']" position="attributes">
+                <attribute name="string">Không đạt</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='pending']" position="attributes">
+                <attribute name="string">Chờ</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

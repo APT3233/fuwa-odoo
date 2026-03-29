@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record rule: HR User chỉ xem/sửa nhân viên thuộc công ty của mình -->
+    <record id="rule_custom_hr_employee_multi_company" model="ir.rule">
+        <field name="name">HR Employee: multi-company access</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">
+            [('company_id', 'in', [company.id for company in user.company_ids])]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Record rule: Chỉ HR Manager mới được xóa nhân viên -->
+    <record id="rule_custom_hr_employee_unlink_manager_only" model="ir.rule">
+        <field name="name">HR Employee: only HR Manager can delete</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+</odoo>

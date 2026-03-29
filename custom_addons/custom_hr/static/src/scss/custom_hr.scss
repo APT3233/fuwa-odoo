@@ -1,0 +1,141 @@
+.custom_hr_employee_form {
+    .custom_hr_header_context {
+        margin-top: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .custom_hr_role_line {
+            font-weight: 600;
+            color: #111827;
+            font-size: 1.05rem;
+        }
+
+        .custom_hr_status_line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 0.95rem;
+
+            .custom_hr_status_widget {
+                .o_statusbar_status {
+                    display: inline-flex;
+                    gap: 6px;
+                    padding: 2px;
+                    background: transparent;
+                    border: none;
+                }
+
+                .o_statusbar_item {
+                    border-radius: 999px;
+                    padding: 2px 10px;
+                    border: 1px solid #e5e7eb;
+                    background: #f3f4f6;
+                    color: #6b7280;
+                }
+
+                .o_statusbar_item.o_statusbar_item_current {
+                    border-color: #22c55e;
+                    background: #dcfce7;
+                    color: #15803d;
+                    font-weight: 600;
+                }
+
+                .o_statusbar_item[data-value="probation"].o_statusbar_item_current {
+                    border-color: #f59e0b;
+                    background: #fef3c7;
+                    color: #b45309;
+                }
+
+                .o_statusbar_item[data-value="terminated"].o_statusbar_item_current {
+                    border-color: #ef4444;
+                    background: #fee2e2;
+                    color: #b91c1c;
+                }
+            }
+        }
+
+        .custom_hr_meta_line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .custom_hr_contact_line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            color: #6b7280;
+            font-size: 0.9rem;
+
+            .custom_hr_contact_item {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .custom_hr_contact_sep {
+                color: #d1d5db;
+            }
+        }
+
+        .custom_hr_meta_label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .custom_hr_sep {
+            color: #9ca3af;
+        }
+    }
+
+    .custom_hr_quick_actions {
+        margin: 10px 0 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .btn {
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-weight: 600;
+        }
+    }
+
+    .custom_hr_overview {
+        .o_group {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+
+        .o_form_label {
+            color: #6b7280;
+        }
+    }
+
+    .custom_hr_work_information {
+        .o_group {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+
+        .o_horizontal_separator {
+            font-weight: 700;
+            color: #111827;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 0.75rem;
+        }
+    }
+}

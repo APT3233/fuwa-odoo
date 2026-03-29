@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Core HR: tabs + groups -->
+    <record id="custom_hr_employee_vn_labels_core" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.core</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="120"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='resume']" position="attributes">
+                <attribute name="string">CV</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='personal_information']" position="attributes">
+                <attribute name="string">Cá nhân</attribute>
+            </xpath>
+            <xpath expr="//group[@name='hr_birth_group']" position="attributes">
+                <attribute name="string">Thông tin cá nhân</attribute>
+            </xpath>
+            <xpath expr="//group[.//field[@name='visa_no'] and .//field[@name='permit_no']]" position="attributes">
+                <attribute name="string">Visa &amp; Giấy phép lao động</attribute>
+            </xpath>
+            <xpath expr="//group[@name='hr_document_group']" position="attributes">
+                <attribute name="string">Tài liệu</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- HR Attendance: Monthly Hours -->
+    <record id="custom_hr_employee_vn_labels_attendance" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.attendance</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_attendance.view_employee_form_inherit_hr_attendance"/>
+        <field name="priority" eval="120"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_last_month_attendances']//span[@class='o_stat_text']" position="replace">
+                <span class="o_stat_text">Giờ làm tháng</span>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OCA: Relatives — đổi label tab "Relatives" → "Người thân" -->
+    <!-- Odoo 19 không cho dùng @string làm selector; replace page qua field bên trong -->
+    <record id="custom_hr_employee_vn_labels_relatives" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.relatives</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_employee_relative.hr_employee_view_form"/>
+        <field name="priority" eval="120"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='relative_ids']/.." position="attributes">
+                <attribute name="string">Người thân</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OCA: Documents stat button -->
+    <record id="custom_hr_employee_vn_labels_documents" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.documents</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_employee_document.hr_employee_view_form"/>
+        <field name="priority" eval="120"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='document_count']" position="attributes">
+                <attribute name="string">Tài liệu</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_hr_employee_vn_labels_documents_public" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.documents.public</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr_employee_document.hr_employee_public_view_form"/>
+        <field name="priority" eval="120"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='document_count']" position="attributes">
+                <attribute name="string">Tài liệu</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OCA: Medical Examinations -->
+    <record id="custom_hr_employee_vn_labels_medical" model="ir.ui.view">
+        <field name="name">custom.hr.employee.vn.labels.medical</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_employee_medical_examination.view_employee_form"/>
+        <field name="priority" eval="120"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='medical_examination_count']" position="attributes">
+                <attribute name="string">Khám sức khỏe</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

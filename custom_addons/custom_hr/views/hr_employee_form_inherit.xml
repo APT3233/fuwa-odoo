@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="custom_hr_employee_form_inherit" model="ir.ui.view">
+        <field name="name">custom.hr.employee.form.inherit</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form[@js_class='hr_employee_form']" position="attributes">
+                <attribute name="class" add="custom_hr_employee_form"/>
+            </xpath>
+            <xpath expr="//div[@id='o_work_information']" position="attributes">
+                <attribute name="class" add="custom_hr_work_information"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

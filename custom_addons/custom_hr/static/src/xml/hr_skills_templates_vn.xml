@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="custom_hr_skills_templates" xml:space="preserve">
+    <t t-name="custom_hr.SkillsListRenderer.vn" t-inherit="hr_skills.SkillsListRenderer" t-inherit-mode="extension">
+        <xpath expr="//div[@name='skills_header']" position="replace">
+            <div name="skills_header" class="skills_header text-uppercase small fw-bolder py-2 mt-4" t-att-class="{'o_horizontal_separator': !showTable }">
+                Kỹ năng &amp; Chứng chỉ
+                <a t-if="!isEmpty &amp;&amp; showTimeline" t-on-click="openSkillsReport" class="float-end cursor-pointer">
+                    <span class="fa fa-line-chart me-1"/>
+                    Dòng thời gian
+                </a>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@name='no_skills']/p" position="replace">
+            <p class="mt-2">Chưa có kỹ năng nào được định nghĩa trong thư viện.</p>
+        </xpath>
+        <xpath expr="//div[@name='no_skills']//button" position="replace">
+            <button t-on-click="skillTypesAction"
+                class="btn btn-secondary align-self-center"
+                role="button" t-if="isEditable">
+                Tạo kỹ năng
+            </button>
+        </xpath>
+
+        <xpath expr="//div[@name='skills_available']/p" position="replace">
+            <p class="mt-2">Bạn có thể thêm kỹ năng từ thư viện vào hồ sơ nhân viên.<br/>
+                Nếu thiếu kỹ năng, HR có thể tạo thêm.</p>
+        </xpath>
+        <xpath expr="//div[@name='skills_available']//button" position="replace">
+            <button t-on-click="props.onAdd"
+                class="btn btn-secondary align-self-center"
+                role="button" t-if="isEditable">
+                Chọn kỹ năng từ danh sách
+            </button>
+        </xpath>
+    </t>
+
+    <t t-name="custom_hr.SkillsListRenderer.Rows.vn" t-inherit="hr_skills.SkillsListRenderer.Rows" t-inherit-mode="extension">
+        <xpath expr="//button[@id='add_button']" position="replace">
+            <button id="add_button" class="btn btn-secondary btn-sm"
+                t-if="isEditable"
+                t-on-click="() => props.onAdd({ context: { default_skill_type_id: skill_group[1].id }})"
+                role="button">THÊM</button>
+        </xpath>
+    </t>
+</templates>

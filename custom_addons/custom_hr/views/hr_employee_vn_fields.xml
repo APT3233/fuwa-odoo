@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bổ sung thông tin VN vào tab Thông tin cá nhân -->
+    <record id="custom_hr_employee_personal_vn" model="ir.ui.view">
+        <field name="name">custom.hr.employee.personal.vn</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="91"/>
+        <field name="arch" type="xml">
+
+            <!-- 1. Bổ sung ngày cấp + nơi cấp CMND/CCCD sau ssnid -->
+            <xpath expr="//page[@name='personal_information']//field[@name='ssnid']" position="after">
+                <field name="id_issue_date" string="Ngày cấp CMND/CCCD"/>
+                <field name="id_issue_place" string="Nơi cấp CMND/CCCD"/>
+            </xpath>
+
+            <!-- 2. Bổ sung Dân tộc, Tôn giáo sau marital -->
+            <xpath expr="//page[@name='personal_information']//field[@name='marital']" position="after">
+                <field name="ethnicity" string="Dân tộc"/>
+                <field name="religion" string="Tôn giáo"/>
+            </xpath>
+
+            <!-- 3. Thêm nhóm Địa chỉ thường trú + tạm trú sau nhóm hr_location_group -->
+            <xpath expr="//page[@name='personal_information']//group[@name='hr_location_group']" position="after">
+                <separator string="Địa chỉ thường trú"/>
+                <field name="permanent_address" colspan="2" string="Số nhà, đường"/>
+                <field name="permanent_ward"/>
+                <field name="permanent_district"/>
+                <field name="permanent_province"/>
+
+                <separator string="Địa chỉ tạm trú"/>
+                <field name="same_as_permanent" string="Giống địa chỉ thường trú"/>
+                <field name="temporary_address" colspan="2" string="Số nhà, đường"
+                       invisible="same_as_permanent"/>
+                <field name="temporary_ward" invisible="same_as_permanent"/>
+                <field name="temporary_district" invisible="same_as_permanent"/>
+                <field name="temporary_province" invisible="same_as_permanent"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

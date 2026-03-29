@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tab Bảo hiểm (BHXH / BHYT) -->
+    <record id="custom_hr_employee_insurance_tab" model="ir.ui.view">
+        <field name="name">custom.hr.employee.insurance.tab</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="92"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="insurance_info" string="Bảo hiểm" groups="hr.group_hr_user">
+                    <group string="Bảo hiểm xã hội (BHXH)">
+                        <group>
+                            <field name="social_insurance_number" string="Số sổ BHXH"/>
+                            <field name="social_insurance_start_date" string="Ngày tham gia"/>
+                            <field name="social_insurance_place" string="Nơi tham gia"/>
+                        </group>
+                    </group>
+                    <group string="Bảo hiểm y tế (BHYT)">
+                        <group>
+                            <field name="health_insurance_number" string="Mã số thẻ BHYT"/>
+                            <field name="health_insurance_expiry" string="Ngày hết hạn"/>
+                            <field name="health_insurance_hospital" string="Nơi đăng ký KCB ban đầu"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tab Thuế TNCN + Người phụ thuộc -->
+    <record id="custom_hr_employee_tax_tab" model="ir.ui.view">
+        <field name="name">custom.hr.employee.tax.tab</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="92"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="tax_info" string="Thuế TNCN" groups="hr.group_hr_user">
+                    <group string="Thông tin thuế thu nhập cá nhân">
+                        <group>
+                            <field name="tax_code" string="Mã số thuế cá nhân"/>
+                            <field name="tax_registration_place" string="Nơi đăng ký nộp thuế"/>
+                            <field name="dependent_count" string="Số người phụ thuộc" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Danh sách người phụ thuộc"/>
+                    <field name="dependent_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="name" string="Họ và tên"/>
+                            <field name="relationship" string="Quan hệ"/>
+                            <field name="birth_date" string="Ngày sinh"/>
+                            <field name="id_number" string="CMND/CCCD"/>
+                            <field name="tax_dependent_code" string="Mã NPT (MST)"/>
+                            <field name="start_date" string="Từ tháng"/>
+                            <field name="end_date" string="Đến tháng"/>
+                            <field name="note" string="Ghi chú"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

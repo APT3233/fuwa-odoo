@@ -1,0 +1,27 @@
+# Bỏ qua toàn bộ Odoo core source — chỉ track custom code
+*
+!.gitignore
+!README.md
+!docker-compose.yml
+!Dockerfile
+!postgres.conf
+!requirements.txt
+
+# custom_addons — track toàn bộ
+!custom_addons/
+!custom_addons/**
+
+# oca_addons — track toàn bộ
+!oca_addons/
+!oca_addons/**
+
+# Bỏ qua file nhạy cảm
+pass.txt
+*.log
+*.pyc
+__pycache__/
+.env
+*.env
+
+# Bỏ qua file tạm
+New Text Document.txt

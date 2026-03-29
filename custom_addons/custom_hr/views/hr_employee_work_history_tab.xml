@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tab Lịch sử công tác -->
+    <record id="custom_hr_employee_work_history_tab" model="ir.ui.view">
+        <field name="name">custom.hr.employee.work.history.tab</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="92"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="work_history" string="Lịch sử công tác" groups="hr.group_hr_user">
+                    <field name="work_history_ids" nolabel="1">
+                        <list create="false" delete="false" editable="bottom">
+                            <field name="start_date" string="Từ ngày"/>
+                            <field name="end_date" string="Đến ngày"/>
+                            <field name="department_id" string="Phòng ban"/>
+                            <field name="job_id" string="Chức danh"/>
+                            <field name="job_title" string="Chức vụ"/>
+                            <field name="manager_id" string="Quản lý"/>
+                            <field name="change_reason" string="Lý do"/>
+                            <field name="decision_number" string="Số quyết định"/>
+                            <field name="note" string="Ghi chú"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
