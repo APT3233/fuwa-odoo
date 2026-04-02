@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+    ================================================================
+    FUWA ODOO — PHÂN QUYỀN TOÀN MODULE
+    ================================================================
+    Cấu trúc 3 cấp:
+      Employee  (base.group_user)          — nhân viên thường
+      Manager   (hr.group_hr_manager)      — quản lý / HR
+      Admin     (base.group_system)        — toàn quyền
+
+    Nguyên tắc:
+      - Employee: xem được thông tin công việc của mình, dự án được giao,
+                  to-do, lịch, tài liệu cá nhân. KHÔNG thấy lương/bảng công người khác.
+      - Manager:  xem + sửa nhân viên cấp dưới, giao task dự án, xem bảng công.
+                  KHÔNG cấu hình hệ thống.
+      - Admin:    toàn quyền (Odoo mặc định đã xử lý qua base.group_system).
+    ================================================================
+    -->
+
+    <!-- ============================================================
+         1. HR EMPLOYEE — Nhân viên
+    ============================================================ -->
+
+    <!-- Employee chỉ xem được hồ sơ của chính mình -->
+    <record id="rule_employee_see_own_record" model="ir.rule">
+        <field name="name">[Employee] Chỉ xem hồ sơ của mình</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- HR User xem được tất cả nhân viên trong công ty -->
+    <record id="rule_hr_user_see_company_employees" model="ir.rule">
+        <field name="name">[HR User] Xem nhân viên trong công ty</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">
+            [('company_id', 'in', [c.id for c in user.company_ids])]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Chỉ HR Manager mới xóa được nhân viên -->
+    <record id="rule_hr_manager_delete_employee" model="ir.rule">
+        <field name="name">[HR Manager] Xóa nhân viên</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         2. LỊCH SỬ CÔNG TÁC (custom_hr.work.history)
+    ============================================================ -->
+
+    <!-- Employee xem lịch sử của chính mình -->
+    <record id="rule_work_history_own" model="ir.rule">
+        <field name="name">[Employee] Xem lịch sử công tác của mình</field>
+        <field name="model_id" ref="custom_hr.model_custom_hr_work_history"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- HR User xem tất cả, HR Manager mới sửa/xóa -->
+    <record id="rule_work_history_hr_user" model="ir.rule">
+        <field name="name">[HR User] Xem lịch sử công tác toàn công ty</field>
+        <field name="model_id" ref="custom_hr.model_custom_hr_work_history"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_work_history_hr_manager" model="ir.rule">
+        <field name="name">[HR Manager] Sửa/xóa lịch sử công tác</field>
+        <field name="model_id" ref="custom_hr.model_custom_hr_work_history"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         3. TÀI KHOẢN NGÂN HÀNG (custom_hr.employee.bank)
+    ============================================================ -->
+
+    <!-- Employee chỉ xem tài khoản của mình -->
+    <record id="rule_bank_own" model="ir.rule">
+        <field name="name">[Employee] Xem tài khoản ngân hàng của mình</field>
+        <field name="model_id" ref="custom_hr.model_custom_hr_employee_bank"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- HR User quản lý tài khoản ngân hàng nhân viên -->
+    <record id="rule_bank_hr_user" model="ir.rule">
+        <field name="name">[HR User] Quản lý tài khoản ngân hàng</field>
+        <field name="model_id" ref="custom_hr.model_custom_hr_employee_bank"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         4. NGƯỜI PHỤ THUỘC THUẾ (custom_hr.tax.dependent)
+    ============================================================ -->
+
+    <!-- Employee chỉ xem người phụ thuộc của mình -->
+    <record id="rule_tax_dependent_own" model="ir.rule">
+        <field name="name">[Employee] Xem người phụ thuộc của mình</field>
+        <field name="model_id" ref="custom_hr.model_custom_hr_tax_dependent"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- HR User quản lý người phụ thuộc -->
+    <record id="rule_tax_dependent_hr_user" model="ir.rule">
+        <field name="name">[HR User] Quản lý người phụ thuộc thuế</field>
+        <field name="model_id" ref="custom_hr.model_custom_hr_tax_dependent"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         5. CHẤM CÔNG (hr.attendance)
+         — Employee xem công của mình; Manager xem toàn bộ
+    ============================================================ -->
+
+    <record id="rule_attendance_own" model="ir.rule">
+        <field name="name">[Employee] Xem bảng chấm công của mình</field>
+        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_attendance_manager" model="ir.rule">
+        <field name="name">[HR Manager] Xem và sửa toàn bộ chấm công</field>
+        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+        <field name="groups" eval="[(4, ref('hr_attendance.group_hr_attendance_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         6. DỰ ÁN (project.project / project.task)
+         — Employee thấy dự án được giao, tự tạo task
+         — Manager thấy tất cả dự án, giao task, cấu hình dự án
+    ============================================================ -->
+
+    <!-- Employee chỉ thấy dự án mình là thành viên -->
+    <record id="rule_project_employee_member" model="ir.rule">
+        <field name="name">[Employee] Xem dự án được phân công</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="groups" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="domain_force">
+            ['|',
+                ('privacy_visibility', '=', 'everyone'),
+                ('message_partner_ids', 'in', [user.partner_id.id])
+            ]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Manager xem và cấu hình tất cả dự án -->
+    <record id="rule_project_manager_all" model="ir.rule">
+        <field name="name">[Manager] Xem và quản lý tất cả dự án</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="groups" eval="[(4, ref('project.group_project_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Employee xem task được giao và task tự tạo -->
+    <record id="rule_task_employee_assigned" model="ir.rule">
+        <field name="name">[Employee] Xem task được giao hoặc tự tạo</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="groups" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="domain_force">
+            ['|',
+                ('user_ids', 'in', [user.id]),
+                ('create_uid', '=', user.id)
+            ]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Manager giao task cho bất kỳ ai, xem tất cả task -->
+    <record id="rule_task_manager_all" model="ir.rule">
+        <field name="name">[Manager] Xem và giao task toàn bộ</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="groups" eval="[(4, ref('project.group_project_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         7. TÀI LIỆU NHÂN VIÊN (hr.employee.document)
+         — Employee xem tài liệu của mình; HR User quản lý tất cả
+    ============================================================ -->
+
+    <record id="rule_employee_document_own" model="ir.rule">
+        <field name="name">[Employee] Xem tài liệu hồ sơ của mình</field>
+        <field name="model_id" ref="hr_employee_document.model_hr_employee_document"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_employee_document_hr_user" model="ir.rule">
+        <field name="name">[HR User] Quản lý tài liệu nhân viên</field>
+        <field name="model_id" ref="hr_employee_document.model_hr_employee_document"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         8. KHÁM SỨC KHỎE (hr.employee.medical.examination)
+         — Employee xem của mình; HR User quản lý tất cả
+    ============================================================ -->
+
+    <record id="rule_medical_own" model="ir.rule">
+        <field name="name">[Employee] Xem lịch sử khám sức khỏe của mình</field>
+        <field name="model_id" ref="hr_employee_medical_examination.model_hr_employee_medical_examination"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_medical_hr_user" model="ir.rule">
+        <field name="name">[HR User] Xem tất cả khám sức khỏe</field>
+        <field name="model_id" ref="hr_employee_medical_examination.model_hr_employee_medical_examination"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_medical_hr_manager" model="ir.rule">
+        <field name="name">[HR Manager] Quản lý toàn bộ khám sức khỏe</field>
+        <field name="model_id" ref="hr_employee_medical_examination.model_hr_employee_medical_examination"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         9. NGƯỜI THÂN (hr.employee.relative)
+         — Employee xem người thân của mình; HR User quản lý
+    ============================================================ -->
+
+    <record id="rule_relative_own" model="ir.rule">
+        <field name="name">[Employee] Xem thông tin người thân của mình</field>
+        <field name="model_id" ref="hr_employee_relative.model_hr_employee_relative"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_relative_hr_user" model="ir.rule">
+        <field name="name">[HR User] Quản lý thông tin người thân</field>
+        <field name="model_id" ref="hr_employee_relative.model_hr_employee_relative"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         10. LỊCH LÀM VIỆC (resource.calendar)
+         — Employee chỉ xem; HR Manager mới được sửa
+    ============================================================ -->
+
+    <record id="rule_resource_calendar_employee" model="ir.rule">
+        <field name="name">[Employee] Xem lịch làm việc</field>
+        <field name="model_id" ref="resource.model_resource_calendar"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_resource_calendar_hr_manager" model="ir.rule">
+        <field name="name">[HR Manager] Cấu hình lịch làm việc</field>
+        <field name="model_id" ref="resource.model_resource_calendar"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         11. PHÒNG BAN (hr.department)
+         — Employee xem; HR Manager mới được sửa
+    ============================================================ -->
+
+    <record id="rule_department_employee" model="ir.rule">
+        <field name="name">[Employee] Xem cơ cấu phòng ban</field>
+        <field name="model_id" ref="hr.model_hr_department"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_department_hr_manager" model="ir.rule">
+        <field name="name">[HR Manager] Quản lý phòng ban</field>
+        <field name="model_id" ref="hr.model_hr_department"/>
+        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

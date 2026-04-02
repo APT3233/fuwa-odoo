@@ -1,8 +1,15 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+# ── Wizards ──────────────────────────────────────────────────────────────────
 access_custom_hr_transfer_department_wizard,custom_hr.transfer.department.wizard,model_custom_hr_transfer_department_wizard,hr.group_hr_user,1,1,1,0
 access_custom_hr_change_manager_wizard,custom_hr.change.manager.wizard,model_custom_hr_change_manager_wizard,hr.group_hr_user,1,1,1,0
 access_custom_hr_terminate_employee_wizard,custom_hr.terminate.employee.wizard,model_custom_hr_terminate_employee_wizard,hr.group_hr_manager,1,1,1,0
-access_custom_hr_work_history_user,custom_hr.work.history user,model_custom_hr_work_history,hr.group_hr_user,1,0,0,0
-access_custom_hr_work_history_manager,custom_hr.work.history manager,model_custom_hr_work_history,hr.group_hr_manager,1,1,1,1
-access_custom_hr_employee_bank_user,custom_hr.employee.bank user,model_custom_hr_employee_bank,hr.group_hr_user,1,1,1,1
-access_custom_hr_tax_dependent_user,custom_hr.tax.dependent user,model_custom_hr_tax_dependent,hr.group_hr_user,1,1,1,1
+# ── Lịch sử công tác ─────────────────────────────────────────────────────────
+access_custom_hr_work_history_employee,custom_hr.work.history employee,model_custom_hr_work_history,base.group_user,1,0,0,0
+access_custom_hr_work_history_hr_user,custom_hr.work.history hr_user,model_custom_hr_work_history,hr.group_hr_user,1,1,1,0
+access_custom_hr_work_history_hr_manager,custom_hr.work.history hr_manager,model_custom_hr_work_history,hr.group_hr_manager,1,1,1,1
+# ── Tài khoản ngân hàng ───────────────────────────────────────────────────────
+access_custom_hr_employee_bank_employee,custom_hr.employee.bank employee,model_custom_hr_employee_bank,base.group_user,1,0,0,0
+access_custom_hr_employee_bank_hr_user,custom_hr.employee.bank hr_user,model_custom_hr_employee_bank,hr.group_hr_user,1,1,1,1
+# ── Người phụ thuộc thuế ─────────────────────────────────────────────────────
+access_custom_hr_tax_dependent_employee,custom_hr.tax.dependent employee,model_custom_hr_tax_dependent,base.group_user,1,0,0,0
+access_custom_hr_tax_dependent_hr_user,custom_hr.tax.dependent hr_user,model_custom_hr_tax_dependent,hr.group_hr_user,1,1,1,1

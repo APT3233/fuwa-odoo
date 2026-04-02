@@ -19,9 +19,11 @@
     "data": [
         "security/ir.model.access.csv",
         "security/hr_employee_rules.xml",
+        "security/access_rules.xml",
         "views/hr_employee_form_inherit.xml",
         "views/hr_homeworking_employee_form_inherit.xml",
-        "views/hr_employee_form_redesign.xml",
+        "views/hr_employee_form_header.xml",     # priority 90: header + quick actions
+        "views/hr_employee_form_work_tab.xml",   # priority 92+95: overview/work tabs + ordering
         "views/hr_employee_vn_fields.xml",
         "views/hr_employee_insurance_tab.xml",
         "views/hr_employee_tax_tab.xml",
@@ -38,7 +40,9 @@
         "web.assets_backend": [
             "custom_hr/static/src/scss/custom_hr.scss",
             "custom_hr/static/src/xml/hr_skills_templates_vn.xml",
+            "custom_hr/static/src/xml/form_status_indicator_vn.xml",
             "custom_hr/static/src/js/org_chart_clone.js",
+            "custom_hr/static/src/js/org_chart_avatar_patch.js",
         ],
     },
     "installable": True,
