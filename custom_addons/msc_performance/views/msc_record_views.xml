@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── MSC Record Form (single screen, no tabs) ──────────────────────── -->
+    <record id="view_msc_record_form" model="ir.ui.view">
+        <field name="name">msc.record.form</field>
+        <field name="model">msc.record</field>
+        <field name="arch" type="xml">
+            <form string="Đánh giá MSC">
+                <header>
+                    <!-- Nhân viên -->
+                    <button name="action_submit" string="Nộp mục tiêu" type="object"
+                            invisible="state != 'draft' or not is_own_record"
+                            class="btn-primary"/>
+                    <button name="action_cancel_submit" string="Hủy nộp" type="object"
+                            invisible="state != 'submitted' or not is_own_record"
+                            class="btn-secondary"/>
+                    <button name="action_submit_result" string="Nộp kết quả" type="object"
+                            invisible="state != 'confirmed' or not is_own_record"
+                            class="btn-primary"/>
+                    <!-- Trưởng CN: dùng is_manager_role — ẩn nếu là Trưởng chi nhánh hoặc Trưởng phòng/Sale Admin -->
+                    <button name="action_pm_confirm_all" string="Xác nhận mục tiêu" type="object"
+                            invisible="state != 'submitted' or is_own_record or is_sale_admin or is_branch_manager or not is_manager_role"
+                            class="btn-primary"/>
+                    <button name="button_pm_reject" string="Từ chối" type="object"
+                            invisible="state != 'submitted' or is_own_record or is_sale_admin or is_branch_manager or not is_manager_role"
+                            class="btn-secondary"/>
+                    <button name="action_pm_approve" string="Phê duyệt kết quả" type="object"
+                            invisible="state != 'result_submitted' or is_own_record or is_sale_admin or is_branch_manager or not is_manager_role"
+                            class="btn-primary"/>
+                    <button name="button_pm_reject_result" string="Từ chối" type="object"
+                            invisible="state != 'result_submitted' or is_own_record or is_sale_admin or is_branch_manager or not is_manager_role"
+                            class="btn-secondary"/>
+                    <button name="button_pm_unapprove" string="Hủy phê duyệt" type="object"
+                            invisible="state != 'pm_approved' or is_own_record or is_branch_manager or not is_manager_role"
+                            class="btn-secondary"/>
+                    <!-- Trưởng phòng: dùng is_bul_role -->
+                    <!-- Xác nhận mục tiêu cho Trưởng chi nhánh -->
+                    <button name="action_bul_confirm_for_manager" string="Xác nhận mục tiêu" type="object"
+                            invisible="state != 'submitted' or is_own_record or not is_branch_manager or not is_bul_role"
+                            class="btn-primary"/>
+                    <button name="button_bul_reject_goals_for_manager" string="Từ chối" type="object"
+                            invisible="state != 'submitted' or is_own_record or not is_branch_manager or not is_bul_role"
+                            class="btn-secondary"/>
+                    <!-- Phê duyệt kết quả: Trưởng chi nhánh (result_submitted) hoặc luồng thường (pm_approved) -->
+                    <button name="action_bul_approve" string="Phê duyệt kết quả" type="object"
+                            invisible="is_own_record or not is_bul_role or not ((state == 'result_submitted' and is_branch_manager) or (state == 'pm_approved' and not is_branch_manager))"
+                            class="btn-primary"/>
+                    <button name="button_bul_reject_result_for_manager" string="Từ chối" type="object"
+                            invisible="state != 'result_submitted' or is_own_record or not is_branch_manager or not is_bul_role"
+                            class="btn-secondary"/>
+                    <button name="button_bul_reject" string="Từ chối" type="object"
+                            invisible="state != 'pm_approved' or is_own_record or is_branch_manager or not is_bul_role"
+                            class="btn-secondary"/>
+                    <button name="button_bul_unapprove" string="Hủy phê duyệt" type="object"
+                            invisible="state != 'bul_approved' or is_own_record or not is_bul_role"
+                            class="btn-secondary"/>
+                    <!-- PMO: dùng is_pmo_role -->
+                    <!-- PMO xác nhận mục tiêu:
+                         - submitted: Sale Admin hoặc Trưởng phòng KD (không qua PM/BUL)
+                         - manager_confirmed: tất cả (sau khi PM/BUL đã xác nhận) -->
+                    <button name="action_pmo_confirm_all" string="Xác nhận mục tiêu (PMO)" type="object"
+                            invisible="is_own_record or not is_pmo_role or not (state in ('manager_confirmed',) or (state == 'submitted' and (is_sale_admin or is_branch_manager)))"
+                            class="btn-primary"/>
+                    <button name="button_pmo_reject_goals" string="Từ chối" type="object"
+                            invisible="is_own_record or not is_pmo_role or not (state in ('manager_confirmed',) or (state == 'submitted' and (is_sale_admin or is_branch_manager)))"
+                            class="btn-secondary"/>
+                    <!-- PMO phê duyệt kết quả -->
+                    <button name="action_pmo_approve" string="PMO Phê duyệt" type="object"
+                            invisible="is_own_record or not is_pmo_role or not ((state == 'bul_approved' and not is_sale_admin) or (state == 'result_submitted' and (is_sale_admin or is_branch_manager)))"
+                            class="btn-primary"/>
+                    <button name="button_pmo_reject" string="Từ chối" type="object"
+                            invisible="is_own_record or not is_pmo_role or not ((state == 'bul_approved' and not is_sale_admin) or (state == 'result_submitted' and (is_sale_admin or is_branch_manager)))"
+                            class="btn-secondary"/>
+                    <button name="button_pmo_unapprove" string="Hủy phê duyệt" type="object"
+                            invisible="state != 'pmo_approved' or is_own_record or not is_pmo_role"
+                            class="btn-secondary"/>
+                    <!-- HR: dùng groups (HR là cấp cao nhất, không cần phân biệt) -->
+                    <button name="action_baseline" string="Xác nhận cuối" type="object"
+                            invisible="state != 'pmo_approved'"
+                            class="btn-primary"
+                            groups="msc_performance.group_msc_admin"/>
+                    <button name="button_hr_reject" string="Từ chối" type="object"
+                            invisible="state != 'pmo_approved'"
+                            class="btn-secondary"
+                            groups="msc_performance.group_msc_admin"/>
+                    <button name="button_hr_reset_to_draft" string="Hoàn trả" type="object"
+                            invisible="state == 'draft'"
+                            class="btn-secondary"
+                            groups="msc_performance.group_msc_admin"
+                            confirm="Bạn có chắc muốn hoàn trả bản ghi này về Nháp? Toàn bộ điểm số sẽ bị xóa."/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,manager_confirmed,confirmed,result_submitted,pm_approved,bul_approved,pmo_approved,baselined"/>
+                </header>
+                <sheet>
+                    <!-- Thông tin cơ bản -->
+                    <group>
+                        <group string="Thông tin nhân viên">
+                            <field name="employee_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                            <field name="report_to_id" string="Quản lý trực tiếp" readonly="1"/>
+                            <field name="employee_parent_id" invisible="1"/>
+                            <field name="is_own_record" invisible="1"/>
+                            <field name="is_manager_role" invisible="1"/>
+                            <field name="is_bul_role" invisible="1"/>
+                            <field name="is_pmo_role" invisible="1"/>
+                        </group>
+                        <group string="Chu kỳ &amp; Kết quả">
+                            <field name="period_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="total_score" readonly="1"/>
+                            <field name="performance_rating" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Gửi trực tiếp đến PMO (bỏ qua Trưởng CN / Trưởng phòng) -->
+                    <group>
+                        <field name="is_sale_admin" string="Gửi trực tiếp đến PMO"
+                               readonly="state != 'draft'"/>
+                    </group>
+                    <!-- Hidden fields dùng cho button expressions -->
+                    <field name="employee_level" invisible="1"/>
+                    <field name="is_branch_manager" invisible="1"/>
+                    <!-- MUST goals -->
+                    <separator string="MUST — 4 mục tiêu bắt buộc (64 điểm) — mỗi mục tiêu 16đ, mỗi cột tối đa 4đ"/>
+                    <field name="must_full" invisible="1"/>
+                    <field name="should_full" invisible="1"/>
+                    <field name="could_full" invisible="1"/>
+                    <field name="must_goal_ids"
+                           context="{'default_goal_type': 'must'}"
+                           readonly="state not in ('draft', 'submitted', 'confirmed', 'result_submitted', 'pm_approved', 'bul_approved')">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="name" placeholder="Tên mục tiêu..."
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="description"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="result_note" optional="show"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"/>
+                            <field name="member_status" widget="badge"
+                                   decoration-success="member_status == 'completed'"
+                                   decoration-danger="member_status == 'in_completed'"
+                                   decoration-info="member_status == 'submitted'"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"/>
+                            <field name="self_work_result" string="KQ (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_work_result >= 3"
+                                   decoration-warning="self_work_result > 0 and self_work_result &lt; 3"
+                                   decoration-danger="self_work_result == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_work_quality" string="CL (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_work_quality >= 3"
+                                   decoration-warning="self_work_quality > 0 and self_work_quality &lt; 3"
+                                   decoration-danger="self_work_quality == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_cost_efficiency" string="HQ (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_cost_efficiency >= 3"
+                                   decoration-warning="self_cost_efficiency > 0 and self_cost_efficiency &lt; 3"
+                                   decoration-danger="self_cost_efficiency == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_scope" string="PV (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_scope >= 3"
+                                   decoration-warning="self_scope > 0 and self_scope &lt; 3"
+                                   decoration-danger="self_scope == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="manager_status" widget="badge"
+                                   decoration-success="manager_status in ('confirmed','approved')"
+                                   decoration-danger="manager_status in ('rejected','un_approved')"
+                                   optional="show"/>
+                            <field name="score_work_result" string="KQ (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_work_result >= 3"
+                                   decoration-warning="score_work_result > 0 and score_work_result &lt; 3"
+                                   decoration-danger="score_work_result == 0"
+                                   decoration-it="score_work_result_modified or bul_score_work_result_modified or pmo_score_work_result_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_work_quality" string="CL (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_work_quality >= 3"
+                                   decoration-warning="score_work_quality > 0 and score_work_quality &lt; 3"
+                                   decoration-danger="score_work_quality == 0"
+                                   decoration-it="score_work_quality_modified or bul_score_work_quality_modified or pmo_score_work_quality_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_cost_efficiency" string="HQ (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_cost_efficiency >= 3"
+                                   decoration-warning="score_cost_efficiency > 0 and score_cost_efficiency &lt; 3"
+                                   decoration-danger="score_cost_efficiency == 0"
+                                   decoration-it="score_cost_efficiency_modified or bul_score_cost_efficiency_modified or pmo_score_cost_efficiency_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_scope" string="PV (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_scope >= 3"
+                                   decoration-warning="score_scope > 0 and score_scope &lt; 3"
+                                   decoration-danger="score_scope == 0"
+                                   decoration-it="score_scope_modified or bul_score_scope_modified or pmo_score_scope_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_total" string="Tổng (QL)" optional="show"/>
+                            <field name="reject_reason" optional="show"
+                                   readonly="parent.is_own_record or parent.state not in ('submitted', 'result_submitted', 'pm_approved', 'bul_approved', 'pmo_approved')"/>
+                            <field name="goal_type" column_invisible="1"/>
+                            <field name="score_max_per_criterion" column_invisible="1"/>
+                            <field name="score_work_result_modified" column_invisible="1"/>
+                            <field name="score_work_quality_modified" column_invisible="1"/>
+                            <field name="score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="score_scope_modified" column_invisible="1"/>
+                            <field name="bul_score_work_result_modified" column_invisible="1"/>
+                            <field name="bul_score_work_quality_modified" column_invisible="1"/>
+                            <field name="bul_score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="bul_score_scope_modified" column_invisible="1"/>
+                            <field name="pmo_score_work_result_modified" column_invisible="1"/>
+                            <field name="pmo_score_work_quality_modified" column_invisible="1"/>
+                            <field name="pmo_score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="pmo_score_scope_modified" column_invisible="1"/>
+                        </list>
+                    </field>
+
+                    <!-- SHOULD goals -->
+                    <separator string="SHOULD — tối đa 2 mục tiêu (24 điểm) — mỗi mục tiêu 12đ, mỗi cột tối đa 3đ"/>
+                    <field name="should_goal_ids"
+                           context="{'default_goal_type': 'should'}"
+                           readonly="state not in ('draft', 'submitted', 'confirmed', 'result_submitted', 'pm_approved', 'bul_approved')">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="name" placeholder="Tên mục tiêu..."
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="description"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="result_note" optional="show"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"/>
+                            <field name="member_status" widget="badge"
+                                   decoration-success="member_status == 'completed'"
+                                   decoration-danger="member_status == 'in_completed'"
+                                   decoration-info="member_status == 'submitted'"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"/>
+                            <field name="self_work_result" string="KQ (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_work_result >= 3"
+                                   decoration-warning="self_work_result > 0 and self_work_result &lt; 3"
+                                   decoration-danger="self_work_result == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_work_quality" string="CL (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_work_quality >= 3"
+                                   decoration-warning="self_work_quality > 0 and self_work_quality &lt; 3"
+                                   decoration-danger="self_work_quality == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_cost_efficiency" string="HQ (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_cost_efficiency >= 3"
+                                   decoration-warning="self_cost_efficiency > 0 and self_cost_efficiency &lt; 3"
+                                   decoration-danger="self_cost_efficiency == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_scope" string="PV (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_scope >= 3"
+                                   decoration-warning="self_scope > 0 and self_scope &lt; 3"
+                                   decoration-danger="self_scope == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="manager_status" widget="badge"
+                                   decoration-success="manager_status in ('confirmed','approved')"
+                                   decoration-danger="manager_status in ('rejected','un_approved')"
+                                   optional="show"/>
+                            <field name="score_work_result" string="KQ (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_work_result >= 3"
+                                   decoration-warning="score_work_result > 0 and score_work_result &lt; 3"
+                                   decoration-danger="score_work_result == 0"
+                                   decoration-it="score_work_result_modified or bul_score_work_result_modified or pmo_score_work_result_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_work_quality" string="CL (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_work_quality >= 3"
+                                   decoration-warning="score_work_quality > 0 and score_work_quality &lt; 3"
+                                   decoration-danger="score_work_quality == 0"
+                                   decoration-it="score_work_quality_modified or bul_score_work_quality_modified or pmo_score_work_quality_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_cost_efficiency" string="HQ (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_cost_efficiency >= 3"
+                                   decoration-warning="score_cost_efficiency > 0 and score_cost_efficiency &lt; 3"
+                                   decoration-danger="score_cost_efficiency == 0"
+                                   decoration-it="score_cost_efficiency_modified or bul_score_cost_efficiency_modified or pmo_score_cost_efficiency_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_scope" string="PV (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_scope >= 3"
+                                   decoration-warning="score_scope > 0 and score_scope &lt; 3"
+                                   decoration-danger="score_scope == 0"
+                                   decoration-it="score_scope_modified or bul_score_scope_modified or pmo_score_scope_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_total" string="Tổng (QL)" optional="show"/>
+                            <field name="reject_reason" optional="show"
+                                   readonly="parent.is_own_record or parent.state not in ('submitted', 'result_submitted', 'pm_approved', 'bul_approved', 'pmo_approved')"/>
+                            <field name="goal_type" column_invisible="1"/>
+                            <field name="score_max_per_criterion" column_invisible="1"/>
+                            <field name="score_work_result_modified" column_invisible="1"/>
+                            <field name="score_work_quality_modified" column_invisible="1"/>
+                            <field name="score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="score_scope_modified" column_invisible="1"/>
+                            <field name="bul_score_work_result_modified" column_invisible="1"/>
+                            <field name="bul_score_work_quality_modified" column_invisible="1"/>
+                            <field name="bul_score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="bul_score_scope_modified" column_invisible="1"/>
+                            <field name="pmo_score_work_result_modified" column_invisible="1"/>
+                            <field name="pmo_score_work_quality_modified" column_invisible="1"/>
+                            <field name="pmo_score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="pmo_score_scope_modified" column_invisible="1"/>
+                        </list>
+                    </field>
+
+                    <!-- COULD goals -->
+                    <separator string="COULD — tối đa 1 mục tiêu (12 điểm) — mỗi mục tiêu 12đ, mỗi cột tối đa 3đ"/>
+                    <field name="could_goal_ids"
+                           context="{'default_goal_type': 'could'}"
+                           readonly="state not in ('draft', 'submitted', 'confirmed', 'result_submitted', 'pm_approved', 'bul_approved')">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="name" placeholder="Tên mục tiêu..."
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="description"
+                                   readonly="parent.state != 'draft'"/>
+                            <field name="result_note" optional="show"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"/>
+                            <field name="member_status" widget="badge"
+                                   decoration-success="member_status == 'completed'"
+                                   decoration-danger="member_status == 'in_completed'"
+                                   decoration-info="member_status == 'submitted'"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"/>
+                            <field name="self_work_result" string="KQ (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_work_result >= 3"
+                                   decoration-warning="self_work_result > 0 and self_work_result &lt; 3"
+                                   decoration-danger="self_work_result == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_work_quality" string="CL (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_work_quality >= 3"
+                                   decoration-warning="self_work_quality > 0 and self_work_quality &lt; 3"
+                                   decoration-danger="self_work_quality == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_cost_efficiency" string="HQ (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_cost_efficiency >= 3"
+                                   decoration-warning="self_cost_efficiency > 0 and self_cost_efficiency &lt; 3"
+                                   decoration-danger="self_cost_efficiency == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="self_scope" string="PV (tự đánh)"
+                                   widget="integer_select"
+                                   decoration-success="self_scope >= 3"
+                                   decoration-warning="self_scope > 0 and self_scope &lt; 3"
+                                   decoration-danger="self_scope == 0"
+                                   readonly="not parent.is_own_record or parent.state not in ('confirmed', 'result_submitted')"
+                                   optional="show"/>
+                            <field name="manager_status" widget="badge"
+                                   decoration-success="manager_status in ('confirmed','approved')"
+                                   decoration-danger="manager_status in ('rejected','un_approved')"
+                                   optional="show"/>
+                            <field name="score_work_result" string="KQ (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_work_result >= 3"
+                                   decoration-warning="score_work_result > 0 and score_work_result &lt; 3"
+                                   decoration-danger="score_work_result == 0"
+                                   decoration-it="score_work_result_modified or bul_score_work_result_modified or pmo_score_work_result_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_work_quality" string="CL (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_work_quality >= 3"
+                                   decoration-warning="score_work_quality > 0 and score_work_quality &lt; 3"
+                                   decoration-danger="score_work_quality == 0"
+                                   decoration-it="score_work_quality_modified or bul_score_work_quality_modified or pmo_score_work_quality_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_cost_efficiency" string="HQ (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_cost_efficiency >= 3"
+                                   decoration-warning="score_cost_efficiency > 0 and score_cost_efficiency &lt; 3"
+                                   decoration-danger="score_cost_efficiency == 0"
+                                   decoration-it="score_cost_efficiency_modified or bul_score_cost_efficiency_modified or pmo_score_cost_efficiency_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_scope" string="PV (QL)"
+                                   widget="integer_select"
+                                   decoration-success="score_scope >= 3"
+                                   decoration-warning="score_scope > 0 and score_scope &lt; 3"
+                                   decoration-danger="score_scope == 0"
+                                   decoration-it="score_scope_modified or bul_score_scope_modified or pmo_score_scope_modified"
+                                   readonly="parent.is_own_record or parent.state not in ('result_submitted', 'pm_approved', 'bul_approved')"
+                                   optional="show"/>
+                            <field name="score_total" string="Tổng (QL)" optional="show"/>
+                            <field name="reject_reason" optional="show"
+                                   readonly="parent.is_own_record or parent.state not in ('submitted', 'result_submitted', 'pm_approved', 'bul_approved', 'pmo_approved')"/>
+                            <field name="goal_type" column_invisible="1"/>
+                            <field name="score_max_per_criterion" column_invisible="1"/>
+                            <field name="score_work_result_modified" column_invisible="1"/>
+                            <field name="score_work_quality_modified" column_invisible="1"/>
+                            <field name="score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="score_scope_modified" column_invisible="1"/>
+                            <field name="bul_score_work_result_modified" column_invisible="1"/>
+                            <field name="bul_score_work_quality_modified" column_invisible="1"/>
+                            <field name="bul_score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="bul_score_scope_modified" column_invisible="1"/>
+                            <field name="pmo_score_work_result_modified" column_invisible="1"/>
+                            <field name="pmo_score_work_quality_modified" column_invisible="1"/>
+                            <field name="pmo_score_cost_efficiency_modified" column_invisible="1"/>
+                            <field name="pmo_score_scope_modified" column_invisible="1"/>
+                        </list>
+                    </field>
+
+                    <!-- Ghi chú -->
+                    <group>
+                        <field name="member_note"
+                               placeholder="Ghi chú của thành viên..."
+                               readonly="not is_own_record"/>
+                        <field name="manager_note"
+                               placeholder="Ghi chú của quản lý..."
+                               readonly="is_own_record"
+                               groups="msc_performance.group_msc_manager"/>
+                    </group>
+
+                    <!-- Nhật ký phê duyệt -->
+                    <separator string="Nhật ký phê duyệt"/>
+                    <field name="approval_log_ids" readonly="1">
+                        <list>
+                            <field name="date"/>
+                            <field name="action"/>
+                            <field name="actor_id"/>
+                            <field name="note"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── List view ─────────────────────────────────────────────────────── -->
+    <record id="view_msc_record_list" model="ir.ui.view">
+        <field name="name">msc.record.list</field>
+        <field name="model">msc.record</field>
+        <field name="arch" type="xml">
+            <list string="MSC" default_order="id desc">
+                <field name="name" optional="show"/>
+                <field name="employee_id" string="Nhân viên"/>
+                <field name="period_id" string="Chu kỳ"/>
+                <field name="department_id" optional="show" string="Phòng ban"/>
+                <field name="report_to_id" string="Quản lý trực tiếp" optional="show"/>
+                <field name="employee_level" string="Loại nhân viên" optional="hide"/>
+                <field name="total_score" string="Tổng điểm" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'baselined'"
+                       decoration-info="state in ('confirmed', 'pm_approved', 'bul_approved', 'pmo_approved')"
+                       decoration-warning="state in ('submitted', 'result_submitted')"
+                       decoration-muted="state == 'draft'"/>
+                <field name="performance_rating" optional="show"
+                       groups="msc_performance.group_msc_manager"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Search view ──────────────────────────────────────────────────── -->
+    <record id="view_msc_record_search" model="ir.ui.view">
+        <field name="name">msc.record.search</field>
+        <field name="model">msc.record</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm MSC">
+                <field name="employee_id"/>
+                <field name="period_id"/>
+                <field name="report_to_id" string="Quản lý"/>
+                <field name="department_id"/>
+                <separator/>
+                <filter name="my_msc" string="MSC của tôi"
+                        domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter name="state_draft" string="Nháp"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="state_submitted" string="Đã nộp mục tiêu"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="state_confirmed" string="Mục tiêu đã xác nhận"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter name="state_result_submitted" string="Đã nộp kết quả"
+                        domain="[('state', '=', 'result_submitted')]"/>
+                <filter name="state_pm_approved" string="Quản lý đã phê duyệt"
+                        domain="[('state', '=', 'pm_approved')]"/>
+                <filter name="state_bul_approved" string="Giám đốc chi nhánh đã phê duyệt"
+                        domain="[('state', '=', 'bul_approved')]"/>
+                <filter name="state_baselined" string="Đã cơ sở hóa"
+                        domain="[('state', '=', 'baselined')]"/>
+                <separator/>
+                <filter name="group_period" string="Chu kỳ"
+                        context="{'group_by': 'period_id'}"/>
+                <filter name="group_department" string="Phòng ban"
+                        context="{'group_by': 'department_id'}"/>
+                <filter name="group_state" string="Trạng thái"
+                        context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Action: MSC của tôi (nhân viên) ─────────────────────────────── -->
+    <record id="action_my_msc" model="ir.actions.act_window">
+        <field name="name">MSC của tôi</field>
+        <field name="res_model">msc.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{"search_default_my_msc": 1}</field>
+        <field name="search_view_id" ref="view_msc_record_search"/>
+    </record>
+</odoo>

@@ -4,32 +4,43 @@
     ================================================================
     FUWA ODOO — PHÂN QUYỀN TOÀN MODULE
     ================================================================
-    Cấu trúc 3 cấp:
-      Employee  (base.group_user)          — nhân viên thường
-      Manager   (hr.group_hr_manager)      — quản lý / HR
-      Admin     (base.group_system)        — toàn quyền
+    Cấu trúc privilege HR (hr.res_groups_privilege_employees):
+      Nhân viên  (custom_hr.group_hr_employee_basic, seq=5)  — không có HR access
+      Chuyên viên (hr.group_hr_user, seq=10)                 — quản lý nhân viên
+      Quản trị viên (hr.group_hr_manager, seq=20)            — toàn quyền HR
 
     Nguyên tắc:
-      - Employee: xem được thông tin công việc của mình, dự án được giao,
-                  to-do, lịch, tài liệu cá nhân. KHÔNG thấy lương/bảng công người khác.
-      - Manager:  xem + sửa nhân viên cấp dưới, giao task dự án, xem bảng công.
-                  KHÔNG cấu hình hệ thống.
-      - Admin:    toàn quyền (Odoo mặc định đã xử lý qua base.group_system).
+      - Nhân viên: chỉ xem tab Tổng quan của hồ sơ nhân viên. Không sửa được.
+      - Chuyên viên/Quản trị: xem + sửa toàn bộ hồ sơ nhân viên.
     ================================================================
     -->
+
+    <!-- ============================================================
+         0. THÊM OPTION "NHÂN VIÊN" VÀO HR PRIVILEGE
+         Sequence=5 (thấp hơn Chuyên viên seq=10) để làm option mặc định.
+         Khi chọn option này, user KHÔNG thuộc hr.group_hr_user/manager
+         → không có write access vào hr.employee.
+    ============================================================ -->
+    <record id="group_hr_employee_basic" model="res.groups">
+        <field name="name">Nhân viên</field>
+        <field name="privilege_id" ref="hr.res_groups_privilege_employees"/>
+        <field name="sequence">5</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Nhân viên bình thường — chỉ xem tab Tổng quan hồ sơ, không có quyền quản lý HR.</field>
+    </record>
 
     <!-- ============================================================
          1. HR EMPLOYEE — Nhân viên
     ============================================================ -->
 
-    <!-- Employee chỉ xem được hồ sơ của chính mình -->
+    <!-- Employee xem được tất cả nhân viên trong công ty, KHÔNG được sửa -->
     <record id="rule_employee_see_own_record" model="ir.rule">
-        <field name="name">[Employee] Chỉ xem hồ sơ của mình</field>
+        <field name="name">[Employee] Xem tất cả nhân viên (read-only)</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
-        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="domain_force">[(1, '=', 1)]</field>
         <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
+        <field name="perm_write" eval="False"/>
         <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="False"/>
     </record>
@@ -58,6 +69,18 @@
         <field name="perm_write" eval="False"/>
         <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Nhân viên chỉ xem phòng ban, không sửa/tạo/xóa -->
+    <record id="rule_department_readonly_employee" model="ir.rule">
+        <field name="name">[Employee] Phòng ban — chỉ xem</field>
+        <field name="model_id" ref="hr.model_hr_department"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
     <!-- ============================================================

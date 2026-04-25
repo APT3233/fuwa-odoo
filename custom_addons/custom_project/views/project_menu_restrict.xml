@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Người dùng (group_project_user) chỉ thấy "Nhiệm vụ của tôi".
+        Các menu dưới đây yêu cầu ít nhất "Quản lý" (group_project_manager_custom).
+    -->
+
+    <!-- Dự án (kanban projects): Nhân viên cũng được xem để navigate vào project kanban -->
+    <record id="project.menu_projects" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('project.group_project_user')])]"/>
+    </record>
+
+    <!--
+        Top-level "Dự án" app menu (id=124) has no action — Odoo picks the first visible child.
+        For Nhân viên the first child with action is "Nhiệm vụ của tôi" (action 207).
+        Override: point the app menu directly to action 197 (project kanban) so clicking
+        "Dự án" always lands on the project list, not My Tasks.
+    -->
+    <record id="project.menu_main_pm" model="ir.ui.menu">
+        <field name="action" ref="project.open_view_project_all"/>
+    </record>
+
+    <!-- Dự án theo Giai đoạn -->
+    <record id="project.menu_projects_group_stage" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('custom_project.group_project_manager_custom')])]"/>
+    </record>
+
+    <!-- Tất cả nhiệm vụ -->
+    <record id="project.menu_project_management_all_tasks" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('custom_project.group_project_manager_custom')])]"/>
+    </record>
+
+    <!-- Báo cáo (toàn bộ menu cha) -->
+    <record id="project.menu_project_report" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('custom_project.group_project_manager_custom')])]"/>
+    </record>
+
+    <!-- Cấu hình: chỉ Quản trị viên (group_project_manager) -->
+    <record id="project.menu_project_config" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('project.group_project_manager')])]"/>
+    </record>
+
+    <!-- Xóa filter mặc định 'Mở' ở Tất cả nhiệm vụ -->
+    <record id="project.action_view_all_task" model="ir.actions.act_window">
+        <field name="context">{'default_user_ids': [(4, uid)]}</field>
+    </record>
+</odoo>

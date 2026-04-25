@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Restrict "Phòng ban" menu to HR users only (default: base.group_user = everyone) -->
+    <record id="hr.menu_hr_department_kanban" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('hr.group_hr_user')])]"/>
+    </record>
+
+    <!-- Restrict "Khám sức khỏe" menu to HR users only -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('hr_employee_medical_examination.hr_employee_medical_examination_menu')]"/>
+        <value eval="{'groups_id': [(6, 0, [ref('hr.group_hr_user')])]}"/>
+    </function>
+
+    <!-- "Nhiệm vụ của tôi" (My Tasks) must be visible to all users — remove any group restriction -->
+    <function model="ir.ui.menu" name="write">
+        <value eval="[ref('project.menu_project_management_my_tasks')]"/>
+        <value eval="{'groups_id': [(5, 0, 0)]}"/>
+    </function>
+</odoo>

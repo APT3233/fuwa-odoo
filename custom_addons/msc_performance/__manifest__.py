@@ -1,0 +1,36 @@
+{
+    "name": "MSC Performance",
+    "version": "19.0.1.0.0",
+    "summary": "Hệ thống đánh giá hiệu suất hàng tháng (Monthly Scorecard)",
+    "author": "Custom",
+    "category": "Human Resources",
+    "license": "LGPL-3",
+    "depends": [
+        "hr",
+        "mail",
+    ],
+    "data": [
+        "security/msc_groups.xml",
+        "security/ir.model.access.csv",
+        "security/msc_rules.xml",
+        "data/msc_cron.xml",
+        "views/msc_period_views.xml",
+        "views/msc_business_unit_views.xml",
+        "views/msc_record_views.xml",
+        "views/msc_confirm_approve_views.xml",
+        "views/msc_baseline_views.xml",
+        "views/msc_bul_dashboard_views.xml",
+        "views/msc_reject_wizard_views.xml",
+        "views/msc_menus.xml",
+    ],
+    "assets": {
+        "web.assets_backend": [
+            "msc_performance/static/src/css/msc_chatter.css",
+            "msc_performance/static/src/css/msc_score_highlight.css",
+            "msc_performance/static/src/js/msc_chatter_toggle.js",
+            "msc_performance/static/src/js/integer_select_widget.js",
+        ],
+    },
+    "installable": True,
+    "application": True,
+}

@@ -37,4 +37,9 @@ COPY . /opt/odoo
 
 EXPOSE 8069
 
+# Odoo 17+ exposes /web/health returning {"status":"pass"}
+# start-period=90s: cho phép Odoo khởi động + load modules trước khi check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+    CMD curl -fsS http://localhost:8069/web/health 2>/dev/null | grep -q '"status":"pass"' || exit 1
+
 CMD ["python", "odoo-bin", "-d", "odoo19", "-i", "base", "--addons-path=/opt/odoo/addons,/opt/odoo/odoo/addons", "--db_host=db", "--db_port=5432", "--db_user=odoo", "--db_password=odoo"]

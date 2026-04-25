@@ -1,0 +1,27 @@
+/* MSC Score highlight: italic + border + background for modified scores */
+
+/* Integer select dropdown in list view */
+.msc_integer_select {
+    width: 52px;
+    padding: 1px 2px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: center;
+    cursor: pointer;
+}
+.msc_integer_select:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+
+.o_list_renderer td.o_field_cell.o_italic {
+    font-style: italic;
+    font-weight: 700;
+    background-color: #fff3cd !important;
+    outline: 2px solid #f0ad4e;
+    outline-offset: -2px;
+    border-radius: 3px;
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Action: Base Line (HR Admin) ──────────────────────────────────── -->
+    <record id="action_msc_baseline" model="ir.actions.act_window">
+        <field name="name">Base Line</field>
+        <field name="res_model">msc.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('bul_approved', 'baselined'))]</field>
+        <field name="context">{"search_default_state_bul_approved": 1}</field>
+        <field name="search_view_id" ref="view_msc_record_search"/>
+        <field name="view_id" ref="view_msc_record_list"/>
+    </record>
+</odoo>

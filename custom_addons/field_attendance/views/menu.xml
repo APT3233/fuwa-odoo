@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu chính cho nhân viên: mở OWL check-in -->
+    <menuitem id="menu_field_checkin_employee"
+        name="Chấm công công tác"
+        parent="hr_attendance.menu_hr_attendance_root"
+        action="action_field_checkin_client"
+        sequence="50"/>
+
+    <!-- Báo cáo chấm công: HR/Manager xem tất cả nhân viên, duyệt -->
+    <menuitem id="menu_field_attendance_report"
+        name="Báo cáo chấm công"
+        parent="hr_attendance.menu_hr_attendance_root"
+        action="action_hr_attendance_report"
+        sequence="80"
+        groups="hr_attendance.group_hr_attendance_user"/>
+
+    <!-- Configuration → Địa điểm chấm công -->
+    <menuitem id="menu_attendance_location"
+        name="Địa điểm chấm công"
+        parent="hr_attendance.menu_hr_attendance_configuration"
+        action="action_attendance_location"
+        sequence="20"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+
+    <!-- Tắt Kiosk Mode (đã có ZKTeco) -->
+    <record id="hr_attendance.menu_action_open_form" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Ẩn menu Quản lý và Tổng quan mặc định của Odoo -->
+    <record id="hr_attendance.menu_hr_attendance_view_attendances_management" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="hr_attendance.menu_hr_attendance_overview" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+</odoo>

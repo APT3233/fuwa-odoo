@@ -138,4 +138,47 @@
             font-size: 0.75rem;
         }
     }
+
+}
+
+// ── Org chart: căn "Full Chart" ngang hàng với tiêu đề ───────────────────
+// o_horizontal_separator chứa cả tên section lẫn link Full Chart (float-end)
+// → đổi sang flexbox để chúng nằm trên cùng 1 dòng
+#o_employee_org_chart {
+    .o_horizontal_separator {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+
+        a {
+            float: none !important;
+            margin: 0 !important;
+            flex-shrink: 0;
+        }
+    }
+}
+
+// ── Back button từ stat views (Ngày nghỉ, Giờ làm, Tài liệu, ...) ────────
+// Odoo tự có breadcrumb, nhưng ta muốn nút rõ ràng hơn
+.o_control_panel .o_breadcrumb {
+    // Đảm bảo breadcrumb item đầu tiên có giao diện như nút
+    .o_back_button,
+    .breadcrumb-item:first-child a {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: #4f46e5;
+        font-weight: 500;
+        text-decoration: none;
+
+        &::before {
+            content: "\f060"; // fa-arrow-left
+            font-family: FontAwesome;
+            font-size: 0.85em;
+        }
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }

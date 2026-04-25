@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Override FormStatusIndicator: thêm text "Lưu" và "Hủy bỏ" bên cạnh icon -->
+<templates xml:space="preserve">
+    <t t-name="web.FormStatusIndicator"
+       t-inherit="web.FormStatusIndicator"
+       t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o_form_button_save')]/i" position="after">
+            <span class="ms-1 d-none d-sm-inline">Lưu</span>
+        </xpath>
+        <xpath expr="//button[hasclass('o_form_button_cancel')]/i" position="after">
+            <span class="ms-1 d-none d-sm-inline">Hủy bỏ</span>
+        </xpath>
+    </t>
+</templates>

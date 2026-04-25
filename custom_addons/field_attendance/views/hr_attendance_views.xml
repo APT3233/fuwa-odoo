@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================= -->
+    <!-- LIST VIEW - HR Dashboard cho Field Attendance                 -->
+    <!-- ============================================================= -->
+    <record id="hr_attendance_field_view_list" model="ir.ui.view">
+        <field name="name">hr.attendance.field.list</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <list string="Chấm công công tác"
+                decoration-danger="review_state == 'rejected'"
+                decoration-success="review_state == 'approved'"
+                decoration-info="review_state == 'working'"
+                decoration-warning="check_in_valid == False and review_state == 'pending'">
+                <field name="employee_id"/>
+                <field name="check_mode" widget="badge"
+                    decoration-info="check_mode == 'office'"
+                    decoration-warning="check_mode == 'field'"
+                    decoration-muted="check_mode == 'manual'"/>
+                <field name="check_in"/>
+                <field name="check_in_location_id"/>
+                <field name="check_in_distance" widget="float" digits="[10,1]"/>
+                <field name="check_in_valid" widget="boolean_toggle" readonly="1"/>
+                <field name="is_new_location" widget="boolean_toggle" readonly="1"
+                    optional="show" string="Địa điểm mới"/>
+                <field name="check_out"/>
+                <field name="check_out_location_id" optional="hide"/>
+                <field name="worked_hours" widget="float_time"/>
+                <field name="review_state" widget="badge"
+                    decoration-info="review_state == 'working'"
+                    decoration-warning="review_state == 'pending'"
+                    decoration-success="review_state == 'approved'"
+                    decoration-danger="review_state in ('rejected', 'no_checkout')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================= -->
+    <!-- FORM VIEW - chi tiết ảnh + bản đồ                              -->
+    <!-- ============================================================= -->
+    <record id="hr_attendance_field_view_form" model="ir.ui.view">
+        <field name="name">hr.attendance.field.form</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <form string="Chấm công chi tiết">
+                <header>
+                    <button name="action_approve" type="object"
+                        string="Duyệt" class="btn-primary"
+                        invisible="review_state == 'approved'"
+                        groups="hr_attendance.group_hr_attendance_manager"/>
+                    <button name="action_reject" type="object"
+                        string="Từ chối" class="btn-danger"
+                        invisible="review_state == 'rejected'"
+                        groups="hr_attendance.group_hr_attendance_manager"/>
+                    <button name="action_reset_review" type="object"
+                        string="Đặt lại"
+                        invisible="review_state == 'pending'"
+                        groups="hr_attendance.group_hr_attendance_manager"/>
+                    <field name="review_state" widget="statusbar"
+                        statusbar_visible="working,pending,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="employee_id" readonly="1"/></h1>
+                        <h3>
+                            <field name="check_mode" readonly="1" widget="badge"
+                                decoration-info="check_mode == 'office'"
+                                decoration-warning="check_mode == 'field'"/>
+                        </h3>
+                    </div>
+
+                    <!-- Thông tin tóm tắt -->
+                    <group>
+                        <group string="Check-in">
+                            <field name="check_in" readonly="1"/>
+                            <field name="check_in_location_id" readonly="1"/>
+                            <field name="check_in_distance" readonly="1"/>
+                            <field name="check_in_valid" readonly="1"/>
+                            <field name="check_in_note" readonly="1"
+                                invisible="not check_in_note"/>
+                        </group>
+                        <group string="Check-out">
+                            <field name="check_out" readonly="1"/>
+                            <field name="check_out_location_id" readonly="1"/>
+                            <field name="check_out_distance" readonly="1"/>
+                            <field name="check_out_valid" readonly="1"/>
+                            <field name="worked_hours" widget="float_time" readonly="1"/>
+                            <field name="check_out_note" readonly="1"
+                                invisible="not check_out_note"/>
+                        </group>
+                    </group>
+
+                    <!-- Quá trình công tác: timeline style -->
+                    <group string="Quá trình công tác"
+                        invisible="not check_in_selfie and not check_in_latitude and not check_out_selfie and not check_out_latitude">
+                        <div class="o_att_timeline">
+
+                            <!-- Check-in entry -->
+                            <div class="o_att_timeline_item"
+                                invisible="not check_in_selfie and not check_in_latitude">
+                                <div class="o_att_timeline_line">
+                                    <span class="o_att_dot o_att_dot_in"/>
+                                    <div class="o_att_line_bar"/>
+                                </div>
+                                <div class="o_att_timeline_card">
+                                    <div class="o_att_card_header">
+                                        <strong>Check-in</strong>
+                                        <span class="text-muted ms-2 small">
+                                            <field name="check_in" nolabel="1" readonly="1"/>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mb-2"
+                                        invisible="not check_in_location_id">
+                                        <i class="fa fa-map-marker me-1" title="GPS"/>
+                                        <field name="check_in_location_id" nolabel="1"
+                                            readonly="1"/>
+                                        <span invisible="not check_in_distance">
+                                            — cách <field name="check_in_distance" nolabel="1"
+                                                readonly="1" widget="float" digits="[10,0]"/>m
+                                        </span>
+                                    </div>
+                                    <div class="o_att_media_row">
+                                        <div class="o_att_selfie_box"
+                                            invisible="not check_in_selfie">
+                                            <field name="check_in_selfie" widget="image"
+                                                options="{'size': [180, 180]}"
+                                                nolabel="1" readonly="1"/>
+                                        </div>
+                                        <div class="o_att_map_box"
+                                            invisible="not check_in_map_html">
+                                            <field name="check_in_map_html" widget="html"
+                                                nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Check-out entry -->
+                            <div class="o_att_timeline_item"
+                                invisible="not check_out_selfie and not check_out_latitude">
+                                <div class="o_att_timeline_line">
+                                    <span class="o_att_dot o_att_dot_out"/>
+                                </div>
+                                <div class="o_att_timeline_card">
+                                    <div class="o_att_card_header">
+                                        <strong>Check-out</strong>
+                                        <span class="text-muted ms-2 small">
+                                            <field name="check_out" nolabel="1" readonly="1"/>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mb-2"
+                                        invisible="not check_out_location_id">
+                                        <i class="fa fa-map-marker me-1" title="GPS"/>
+                                        <field name="check_out_location_id" nolabel="1"
+                                            readonly="1"/>
+                                        <span invisible="not check_out_distance">
+                                            — cách <field name="check_out_distance" nolabel="1"
+                                                readonly="1" widget="float" digits="[10,0]"/>m
+                                        </span>
+                                    </div>
+                                    <div class="o_att_media_row">
+                                        <div class="o_att_selfie_box"
+                                            invisible="not check_out_selfie">
+                                            <field name="check_out_selfie" widget="image"
+                                                options="{'size': [180, 180]}"
+                                                nolabel="1" readonly="1"/>
+                                        </div>
+                                        <div class="o_att_map_box"
+                                            invisible="not check_out_map_html">
+                                            <field name="check_out_map_html" widget="html"
+                                                nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </group>
+
+                    <!-- Duyệt -->
+                    <group string="Thông tin duyệt"
+                        invisible="review_state == 'pending' and not review_notes">
+                        <field name="reviewed_by" readonly="1"/>
+                        <field name="reviewed_on" readonly="1"/>
+                        <field name="review_notes" placeholder="Ghi chú khi duyệt/từ chối..."
+                            groups="hr_attendance.group_hr_attendance_manager"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================= -->
+    <!-- SEARCH VIEW                                                   -->
+    <!-- ============================================================= -->
+    <record id="hr_attendance_field_view_search" model="ir.ui.view">
+        <field name="name">hr.attendance.field.search</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="check_in_location_id"/>
+                <filter string="Công tác ngoài" name="field"
+                    domain="[('check_mode','=','field')]"/>
+                <filter string="Văn phòng" name="office"
+                    domain="[('check_mode','=','office')]"/>
+                <separator/>
+                <filter string="Chờ duyệt" name="pending"
+                    domain="[('review_state','=','pending')]"/>
+                <filter string="Đã duyệt" name="approved"
+                    domain="[('review_state','=','approved')]"/>
+                <filter string="Từ chối" name="rejected"
+                    domain="[('review_state','=','rejected')]"/>
+                <separator/>
+                <filter string="Ngoài bán kính" name="invalid"
+                    domain="[('check_in_valid','=',False), ('check_mode','=','field')]"/>
+                <filter string="Địa điểm mới" name="new_location"
+                    domain="[('is_new_location','=',True)]"/>
+                <separator/>
+                <filter string="Hôm nay" name="today"
+                    domain="[('check_in','&gt;=', (context_today()).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="Tuần này" name="this_week"
+                    domain="[('check_in','&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <separator/>
+                <filter string="Nhân viên" name="group_employee"
+                    context="{'group_by':'employee_id'}"/>
+                <filter string="Địa điểm" name="group_location"
+                    context="{'group_by':'check_in_location_id'}"/>
+                <filter string="Ngày" name="group_day"
+                    context="{'group_by':'check_in:day'}"/>
+                <filter string="Hình thức" name="group_mode"
+                    context="{'group_by':'check_mode'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================= -->
+    <!-- Override "Chấm công của tôi" — chỉ hiện record của user này -->
+    <!-- ============================================================= -->
+    <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+    </record>
+
+    <!-- ============================================================= -->
+    <!-- ACTION - Field Attendance (chấm công công tác ngoài)         -->
+    <!-- ============================================================= -->
+    <record id="action_hr_attendance_field" model="ir.actions.act_window">
+        <field name="name">Chấm công công tác</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('check_mode','=','field')]</field>
+        <field name="context">{
+            'search_default_field': 1,
+            'search_default_pending': 1,
+        }</field>
+        <field name="search_view_id" ref="hr_attendance_field_view_search"/>
+    </record>
+
+    <!-- Force action to use field views -->
+    <record id="action_hr_attendance_field_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="hr_attendance_field_view_list"/>
+        <field name="act_window_id" ref="action_hr_attendance_field"/>
+    </record>
+    <record id="action_hr_attendance_field_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hr_attendance_field_view_form"/>
+        <field name="act_window_id" ref="action_hr_attendance_field"/>
+    </record>
+
+    <!-- ============================================================= -->
+    <!-- ACTION - Báo cáo chấm công (tất cả nhân viên, dành cho HR)  -->
+    <!-- ============================================================= -->
+    <record id="action_hr_attendance_report" model="ir.actions.act_window">
+        <field name="name">Báo cáo chấm công</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="hr_attendance_field_view_search"/>
+    </record>
+
+    <record id="action_hr_attendance_report_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="hr_attendance_field_view_list"/>
+        <field name="act_window_id" ref="action_hr_attendance_report"/>
+    </record>
+    <record id="action_hr_attendance_report_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hr_attendance_field_view_form"/>
+        <field name="act_window_id" ref="action_hr_attendance_report"/>
+    </record>
+</odoo>

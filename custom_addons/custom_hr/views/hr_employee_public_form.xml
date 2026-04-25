@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Override hr.employee.public form for non-HR users (role "Nhân viên").
+        Non-HR users see hr.employee.public (read-only proxy), not hr.employee.
+
+        Org chart: we duplicate the org chart content directly in the overview tab
+        (same structure as hr_org_chart injects into o_employee_org_chart).
+        The work_information tab is hidden so there is no duplication visible.
+    -->
+
+    <!-- Priority 92: Add "Tổng quan" tab with org chart content inline -->
+    <record id="custom_hr_employee_public_overview_tab" model="ir.ui.view">
+        <field name="name">custom.hr.employee.public.overview.tab</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
+        <field name="priority" eval="92"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='work_information']" position="before">
+                <page name="overview" string="Tổng quan">
+                    <div class="row custom_hr_overview">
+                        <div class="col-lg-7 d-flex flex-column">
+                            <group string="Thông tin chức vụ">
+                                <field name="department_id" readonly="1"/>
+                                <field name="job_title" readonly="1"/>
+                                <field name="parent_id"
+                                       widget="many2one_avatar_employee"
+                                       readonly="1"/>
+                            </group>
+                        </div>
+                        <div class="col-lg-5 d-flex flex-column">
+                            <div invisible="not subordinate_ids and (not parent_id or parent_id == id)">
+                                <div class="d-flex flex-column align-items-start mt-0 pt-4 w-100" style="cursor: default;">
+                                    <div class="d-flex justify-content-between w-100 mb-0">
+                                        <span class="text-uppercase fw-bolder" style="font-size: 13px">Sơ đồ tổ chức</span>
+                                        <a name="%(hr_org_chart.action_hr_employee_public_org_chart)d"
+                                           type="action"
+                                           role="button"
+                                           context="{'hierarchy_res_id': id}">
+                                            <i class="fa fa-sitemap me-1 mt-1"/>
+                                            <span class="fw-bolder">Full Chart</span>
+                                        </a>
+                                    </div>
+                                    <div class="w-100 border-top border-1 border-secondary mt-0 mb-3"/>
+                                </div>
+                            </div>
+                            <div invisible="subordinate_ids or (parent_id and not parent_id == id)">
+                                <div class="d-flex flex-column align-items-start mt-0 pt-4" style="cursor: default;">
+                                    <div class="d-flex align-items-left mb-0">
+                                        <span class="text-uppercase fw-bolder" style="font-size: 13px">Sơ đồ tổ chức</span>
+                                    </div>
+                                    <div class="w-100 border-top border-1 border-secondary mt-0 mb-3"/>
+                                </div>
+                            </div>
+                            <field name="child_ids" class="position-relative" widget="hr_org_chart" readonly="1" nolabel="1"/>
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Priority 98: Hide Work tab -->
+    <record id="custom_hr_employee_public_tab_groups" model="ir.ui.view">
+        <field name="name">custom.hr.employee.public.tab.groups</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
+        <field name="priority" eval="98"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='work_information']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Priority 98: Hide Resume + Certification tabs (from hr_skills) -->
+    <record id="custom_hr_employee_public_cert_groups" model="ir.ui.view">
+        <field name="name">custom.hr.employee.public.cert.groups</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr_skills.hr_employee_public_view_form_inherit"/>
+        <field name="priority" eval="98"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='resume']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='certification']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

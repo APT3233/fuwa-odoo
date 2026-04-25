@@ -95,13 +95,50 @@ class HrEmployeeVN(models.Model):
         groups="hr.group_hr_user",
     )
 
-    @api.onchange("same_as_permanent")
-    def _onchange_same_as_permanent(self):
+    # Sync UI khi user tick checkbox hoặc chỉnh thường trú trên form
+    @api.onchange(
+        "same_as_permanent",
+        "permanent_address",
+        "permanent_ward",
+        "permanent_district",
+        "permanent_province",
+    )
+    def _onchange_sync_temporary_address(self):
         if self.same_as_permanent:
             self.temporary_address = self.permanent_address
             self.temporary_ward = self.permanent_ward
             self.temporary_district = self.permanent_district
             self.temporary_province = self.permanent_province
+
+    def write(self, vals):
+        """Sync tạm trú khi lưu qua API/code (không qua UI onchange)."""
+        _ADDR_TRIGGERS = frozenset({
+            "same_as_permanent",
+            "permanent_address",
+            "permanent_ward",
+            "permanent_district",
+            "permanent_province",
+        })
+        if _ADDR_TRIGGERS & set(vals.keys()):
+            result = True
+            for record in self:
+                rec_vals = dict(vals)
+                if rec_vals.get("same_as_permanent", record.same_as_permanent):
+                    rec_vals["temporary_address"] = rec_vals.get(
+                        "permanent_address", record.permanent_address
+                    )
+                    rec_vals["temporary_ward"] = rec_vals.get(
+                        "permanent_ward", record.permanent_ward
+                    )
+                    rec_vals["temporary_district"] = rec_vals.get(
+                        "permanent_district", record.permanent_district
+                    )
+                    rec_vals["temporary_province"] = rec_vals.get(
+                        "permanent_province", record.permanent_province
+                    )
+                result = super(HrEmployeeVN, record).write(rec_vals) and result
+            return result
+        return super().write(vals)
 
     # ── BHXH ─────────────────────────────────────────────────────────────────
     social_insurance_number = fields.Char(
@@ -148,9 +185,12 @@ class HrEmployeeVN(models.Model):
         string="Nơi đăng ký nộp thuế",
         groups="hr.group_hr_user",
     )
+
+    # store=True: lưu vào DB → không query lại mỗi lần render danh sách
     dependent_count = fields.Integer(
         string="Số người phụ thuộc",
-        default=0,
+        compute="_compute_dependent_count",
+        store=True,
         groups="hr.group_hr_user",
         tracking=True,
     )
@@ -161,11 +201,20 @@ class HrEmployeeVN(models.Model):
         groups="hr.group_hr_user",
     )
 
-    @api.onchange("dependent_ids")
-    def _onchange_dependent_ids(self):
-        self.dependent_count = len(self.dependent_ids)
+    @api.depends("dependent_ids")
+    def _compute_dependent_count(self):
+        for record in self:
+            record.dependent_count = len(record.dependent_ids)
 
     # ── SQL constraints ───────────────────────────────────────────────────────
+    # models.Constraint() là syntax Odoo 17+.
+    # Nếu cần tương thích Odoo 16 trở xuống, dùng _sql_constraints thay thế:
+    # _sql_constraints = [
+    #     ("social_insurance_number_uniq", "unique(social_insurance_number)",
+    #      "Số sổ BHXH phải là duy nhất trong hệ thống."),
+    #     ("tax_code_uniq", "unique(tax_code)",
+    #      "Mã số thuế cá nhân phải là duy nhất trong hệ thống."),
+    # ]
     _social_insurance_number_uniq = models.Constraint(
         "unique(social_insurance_number)",
         "Số sổ BHXH phải là duy nhất trong hệ thống.",

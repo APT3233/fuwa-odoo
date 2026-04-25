@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Mở rộng HR privilege (hr.res_groups_privilege_employees) thêm option "Nhân viên".
+
+        Privilege HR mặc định của Odoo 19 chỉ có 2 level:
+          seq=10  Chuyên viên   (hr.group_hr_user)    — write access vào hr.employee
+          seq=20  Quản trị viên (hr.group_hr_manager)  — full HR admin
+
+        File này thêm level thứ 0:
+          seq=5   Nhân viên     (group_hr_employee_basic) — không có HR access
+
+        Khi admin chọn "Nhân viên" cho một user:
+          - User KHÔNG thuộc hr.group_hr_user → không write được hr.employee
+          - Form nhân viên chỉ hiển thị tab "Tổng quan" (readonly)
+          - Các tab nhạy cảm ẩn do groups="hr.group_hr_user" trong views
+
+        Cách dùng: Settings → Users → chọn user → NHÂN SỰ → chọn "Nhân viên"
+    -->
+    <record id="group_hr_employee_basic" model="res.groups">
+        <field name="name">Nhân viên</field>
+        <field name="privilege_id" ref="hr.res_groups_privilege_employees"/>
+        <field name="sequence">5</field>
+
+        <field name="comment">Nhân viên bình thường — chỉ xem tab Tổng quan, không có quyền quản lý HR.</field>
+    </record>
+</odoo>

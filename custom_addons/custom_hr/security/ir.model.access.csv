@@ -1,4 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+# ── Nhân viên — chỉ xem hr.employee (read-only) ──────────────────────────────
+access_hr_employee_readonly,hr.employee readonly for base user,hr.model_hr_employee,base.group_user,1,0,0,0
+# ── Phòng ban — nhân viên chỉ xem ────────────────────────────────────────────
+access_hr_department_readonly,hr.department readonly for employee,hr.model_hr_department,base.group_user,1,0,0,0
 # ── Wizards ──────────────────────────────────────────────────────────────────
 access_custom_hr_transfer_department_wizard,custom_hr.transfer.department.wizard,model_custom_hr_transfer_department_wizard,hr.group_hr_user,1,1,1,0
 access_custom_hr_change_manager_wizard,custom_hr.change.manager.wizard,model_custom_hr_change_manager_wizard,hr.group_hr_user,1,1,1,0

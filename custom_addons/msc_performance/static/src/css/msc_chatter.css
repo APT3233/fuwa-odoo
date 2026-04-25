@@ -1,0 +1,41 @@
+/* MSC Performance — collapsible chatter */
+
+.o_form_view .o_form_sheet_bg {
+    transition: width 0.25s ease;
+}
+
+/* Collapsed state: chatter hidden, sheet takes full width */
+.o_form_view.msc_chatter_collapsed .o-mail-ChatterContainer,
+.o_form_view.msc_chatter_collapsed .o_mail_chatter_container {
+    display: none !important;
+}
+
+/* Toggle button */
+.msc_chatter_toggle {
+    position: fixed;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1050;
+    background: #7c5cbf;
+    color: #fff;
+    border: none;
+    border-radius: 4px 0 0 4px;
+    padding: 8px 6px;
+    cursor: pointer;
+    writing-mode: vertical-rl;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.15);
+    transition: background 0.2s;
+}
+.msc_chatter_toggle:hover {
+    background: #5a3e9b;
+}
+.msc_chatter_toggle .msc_toggle_icon {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-style: normal;
+    font-size: 14px;
+}

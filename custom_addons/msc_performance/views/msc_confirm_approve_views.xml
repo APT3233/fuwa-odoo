@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Action: Tất cả bản ghi (Quản lý - thấy theo department) ──────── -->
+    <record id="action_msc_all_records" model="ir.actions.act_window">
+        <field name="name">Tất cả bản ghi</field>
+        <field name="res_model">msc.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_msc_record_search"/>
+        <field name="view_id" ref="view_msc_record_list"/>
+    </record>
+
+    <!-- ── Action: Xác nhận mục tiêu (Quản lý) ──────────────────────────── -->
+    <record id="action_msc_confirm_goals" model="ir.actions.act_window">
+        <field name="name">Xác nhận mục tiêu</field>
+        <field name="res_model">msc.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'submitted'), ('report_to_id.user_id', '=', uid)]</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_msc_record_search"/>
+        <field name="view_id" ref="view_msc_record_list"/>
+    </record>
+
+    <!-- ── Action: Phê duyệt kết quả (Quản lý) ──────────────────────────── -->
+    <record id="action_msc_approve_results" model="ir.actions.act_window">
+        <field name="name">Phê duyệt kết quả</field>
+        <field name="res_model">msc.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'result_submitted'), ('report_to_id.user_id', '=', uid)]</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_msc_record_search"/>
+        <field name="view_id" ref="view_msc_record_list"/>
+    </record>
+
+    <!-- ── Action: Giám đốc chi nhánh phê duyệt ─────────────────────────── -->
+    <record id="action_msc_bul_approve" model="ir.actions.act_window">
+        <field name="name">Phê duyệt (Giám đốc chi nhánh)</field>
+        <field name="res_model">msc.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'pm_approved')]</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_msc_record_search"/>
+        <field name="view_id" ref="view_msc_record_list"/>
+    </record>
+
+    <!-- ── Action: HR Baseline ────────────────────────────────────────────── -->
+    <record id="action_msc_baseline" model="ir.actions.act_window">
+        <field name="name">Xác nhận cuối (HR)</field>
+        <field name="res_model">msc.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'bul_approved')]</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_msc_record_search"/>
+        <field name="view_id" ref="view_msc_record_list"/>
+    </record>
+</odoo>

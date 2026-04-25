@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_msc_business_unit_form" model="ir.ui.view">
+        <field name="name">msc.business.unit.form</field>
+        <field name="model">msc.business.unit</field>
+        <field name="arch" type="xml">
+            <form string="Đơn vị kinh doanh">
+                <sheet>
+                    <widget name="web_ribbon" title="Lưu trữ" invisible="active"/>
+                    <group>
+                        <group string="Thông tin chung">
+                            <field name="name"/>
+                            <field name="year"/>
+                            <field name="active" widget="boolean_toggle"
+                                   groups="msc_performance.group_msc_admin"/>
+                        </group>
+                        <group string="Lãnh đạo">
+                            <field name="bul_id" string="Giám đốc chi nhánh"/>
+                            <field name="vice_bul_ids" widget="many2many_tags" string="Phó giám đốc"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Quản lý">
+                            <field name="pm_ids" widget="many2many_tags" nolabel="1"/>
+                        </group>
+                        <group string="Người theo dõi">
+                            <field name="watcher_ids" widget="many2many_tags" nolabel="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Mô tả đơn vị kinh doanh..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_msc_business_unit_list" model="ir.ui.view">
+        <field name="name">msc.business.unit.list</field>
+        <field name="model">msc.business.unit</field>
+        <field name="arch" type="xml">
+            <list string="Đơn vị kinh doanh">
+                <field name="name"/>
+                <field name="year"/>
+                <field name="bul_id" string="Giám đốc chi nhánh"/>
+                <field name="pm_ids" widget="many2many_tags" string="Quản lý"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_msc_business_unit" model="ir.actions.act_window">
+        <field name="name">Đơn vị kinh doanh</field>
+        <field name="res_model">msc.business.unit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

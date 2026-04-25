@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="attendance_location_view_list" model="ir.ui.view">
+        <field name="name">attendance.location.list</field>
+        <field name="model">attendance.location</field>
+        <field name="arch" type="xml">
+            <list string="Địa điểm chấm công">
+                <field name="name"/>
+                <field name="location_type"/>
+                <field name="partner_id" optional="show"/>
+                <field name="address" optional="show"/>
+                <field name="latitude_input" string="Vĩ độ" optional="show"/>
+                <field name="longitude_input" string="Kinh độ" optional="hide"/>
+                <field name="radius"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="attendance_location_view_form" model="ir.ui.view">
+        <field name="name">attendance.location.form</field>
+        <field name="model">attendance.location</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Đã tắt" bg_color="bg-danger"
+                        invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Tên địa điểm..."/></h1>
+                    </div>
+                    <group>
+                        <group string="Thông tin">
+                            <field name="location_type"/>
+                            <field name="partner_id"
+                                invisible="location_type != 'customer'"
+                                required="location_type == 'customer'"/>
+                            <field name="address" placeholder="Số nhà, đường, quận, thành phố..."/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Tọa độ GPS">
+                            <field name="latitude_input" placeholder="16.051682"/>
+                            <field name="longitude_input" placeholder="108.209630"/>
+                            <field name="radius"/>
+                            <field name="google_maps_url" widget="url"
+                                string="Xem trên Google Maps"
+                                invisible="not google_maps_url"/>
+                        </group>
+                    </group>
+                    <group string="Hướng dẫn lấy tọa độ GPS">
+                        <div class="alert alert-info" role="alert">
+                            <ol class="mb-0">
+                                <li>Mở <a href="https://www.google.com/maps" target="_blank">Google Maps</a></li>
+                                <li>Tìm địa chỉ cần lấy tọa độ</li>
+                                <li>Chuột phải vào vị trí chính xác → chọn dòng đầu (dạng <code>10.7626, 106.6602</code>)</li>
+                                <li>Dán <strong>Vĩ độ</strong> (số đầu) và <strong>Kinh độ</strong> (số sau) vào form này</li>
+                            </ol>
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="attendance_location_view_search" model="ir.ui.view">
+        <field name="name">attendance.location.search</field>
+        <field name="model">attendance.location</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="address"/>
+                <filter string="Văn phòng" name="office"
+                    domain="[('location_type','=','office')]"/>
+                <filter string="Khách hàng" name="customer"
+                    domain="[('location_type','=','customer')]"/>
+                <filter string="Công trường" name="site"
+                    domain="[('location_type','=','site')]"/>
+                <separator/>
+                <filter string="Đang hoạt động" name="active" domain="[('active','=',True)]"/>
+                <separator/>
+                <filter string="Loại địa điểm" name="group_type"
+                    context="{'group_by':'location_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_attendance_location" model="ir.actions.act_window">
+        <field name="name">Địa điểm chấm công</field>
+        <field name="res_model">attendance.location</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Đổi tên role chấm công sang tiếng Việt -->
+        <record id="hr_attendance.group_hr_attendance_user" model="res.groups">
+            <field name="name">HR</field>
+        </record>
+        <record id="hr_attendance.group_hr_attendance_manager" model="res.groups">
+            <field name="name">Quản trị viên chấm công</field>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <!-- Nhân viên chỉ thấy attendance.location trong công ty của họ -->
+        <record id="rule_attendance_location_company" model="ir.rule">
+            <field name="name">Attendance Location: multi-company</field>
+            <field name="model_id" ref="model_attendance_location"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+        </record>
+    </data>
+</odoo>

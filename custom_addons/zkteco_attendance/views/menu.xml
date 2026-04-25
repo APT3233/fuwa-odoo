@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ZKTeco sub-menu under Attendances -->
+    <menuitem id="menu_zkteco_root"
+        name="ZKTeco"
+        parent="hr_attendance.menu_hr_attendance_root"
+        sequence="90"/>
+
+    <menuitem id="menu_zkteco_device"
+        name="Máy chấm công"
+        parent="menu_zkteco_root"
+        action="action_zkteco_device"
+        sequence="10"/>
+
+    <menuitem id="menu_zkteco_log"
+        name="Log chấm công"
+        parent="menu_zkteco_root"
+        action="action_zkteco_log"
+        sequence="20"/>
+</odoo>

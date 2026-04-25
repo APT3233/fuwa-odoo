@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Priority 92 — Notebook: Overview tab + Work tab restructure + Tab ordering
+        Tách riêng khỏi header (priority 90) để mỗi file có 1 trách nhiệm rõ ràng.
+    -->
+    <record id="custom_hr_employee_form_work_tab" model="ir.ui.view">
+        <field name="name">custom.hr.employee.form.work.tab</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="92"/>
+        <field name="arch" type="xml">
+
+            <!-- Đổi tên tab Work Information → Công việc -->
+            <xpath expr="//notebook/page[@name='work_information']" position="attributes">
+                <attribute name="string">Công việc</attribute>
+            </xpath>
+
+            <!-- Thêm tab Tổng quan trước tab Công việc -->
+            <xpath expr="//notebook/page[@name='work_information']" position="before">
+                <page name="overview" string="Tổng quan">
+                    <div class="row custom_hr_overview">
+                        <div class="col-lg-7 d-flex flex-column">
+                            <group string="Thông tin chức vụ">
+                                <field name="department_id" readonly="1"/>
+                                <field name="job_title" readonly="1"/>
+                                <field name="parent_id"
+                                       widget="many2one_avatar_employee"
+                                       readonly="1"/>
+                            </group>
+                            <group string="Thông tin nhân sự">
+                                <field name="employment_status"
+                                       widget="statusbar"
+                                       options="{'clickable': False}"
+                                       readonly="1"/>
+                                <field name="employment_type" readonly="1"/>
+                                <field name="join_date" readonly="1"/>
+                            </group>
+                            <group string="Thâm niên">
+                                <field name="service_duration_years"
+                                       string="Số năm" readonly="1"/>
+                                <field name="service_duration_months"
+                                       string="Số tháng" readonly="1"/>
+                            </group>
+                        </div>
+                        <div class="col-lg-5">
+                            <div id="custom_hr_org_chart_overview"
+                                 class="o_hr_column custom_hr_org_chart"/>
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+
+            <!-- Di chuyển org chart widget vào Overview (tránh render trùng) -->
+            <xpath expr="//div[@id='custom_hr_org_chart_overview']" position="inside">
+                <xpath expr="//div[@id='o_employee_org_chart']" position="move"/>
+            </xpath>
+
+            <!-- Tái cấu trúc nội dung tab Công việc -->
+            <xpath expr="//div[@id='o_work_information']" position="replace">
+                <div id="o_work_information"
+                     class="o_hr_column col-lg-7 d-flex flex-column custom_hr_work_information">
+                    <group string="Thông tin công việc">
+                        <field name="company_id"
+                               groups="base.group_multi_company"
+                               domain="[('id', 'in', allowed_company_ids)]"/>
+                        <field name="department_id"/>
+                        <field name="job_id"
+                               string="Vị trí công việc"
+                               context="{'default_no_of_recruitment': 0,
+                                         'default_is_favorite': False}"
+                               placeholder="vd. Trưởng phòng kinh doanh"/>
+                        <field name="job_title"/>
+                        <field name="parent_id" widget="many2one_avatar_employee"/>
+                    </group>
+                    <group string="Thông tin làm việc">
+                        <field name="address_id"
+                               context="{'show_address': 1}"
+                               options='{"highlight_first_line": True}'/>
+                        <field name="work_location_id"
+                               context="{'default_address_id': address_id}"
+                               placeholder="vd. Tòa nhà B, Làm từ xa..."/>
+                        <field name="resource_calendar_id"/>
+                    </group>
+                    <group string="Liên hệ công việc">
+                        <field name="work_email" widget="email"
+                               placeholder="vd. nguyenvana@congty.com"
+                               string="Email công việc"/>
+                        <field name="work_phone" widget="phone"
+                               placeholder="Điện thoại bàn"
+                               string="Điện thoại bàn"/>
+                        <field name="mobile_phone" widget="phone"
+                               placeholder="Di động"
+                               string="Di động"/>
+                    </group>
+                    <group name="departure" string="Thông tin nghỉ việc"
+                           invisible="active">
+                        <field name="departure_reason_id"
+                               options="{'no_edit': True, 'no_create': True, 'no_open': True}"/>
+                        <field name="departure_description"/>
+                        <field name="departure_date"/>
+                    </group>
+                    <group name="note" string="Ghi chú" groups="hr.group_hr_user">
+                        <field name="additional_note"
+                               placeholder="Ghi chú thêm về nhân viên này..."
+                               colspan="2"
+                               nolabel="1"/>
+                    </group>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!--
+        Priority 95 — Tab ordering: đưa "Cá nhân" lên trước "CV"
+        Tách record riêng vì dùng inherit_id khác (sau khi tab đã được đổi tên ở priority 92).
+    -->
+    <record id="custom_hr_employee_form_tab_order" model="ir.ui.view">
+        <field name="name">custom.hr.employee.form.tab.order</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="95"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='resume']" position="before">
+                <xpath expr="//notebook/page[@name='personal_information']"
+                       position="move"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        Priority 98 — Tab visibility: ẩn các tab nhạy cảm với nhân viên thường.
+        Nhân viên không thuộc hr.group_hr_user chỉ thấy tab "Tổng quan" (đã readonly).
+        Các tab tùy chỉnh (Bảo hiểm, Thuế, Tài khoản NH, Lịch sử) đã có groups riêng.
+        File này xử lý các tab gốc của Odoo: Công việc, Cá nhân, CV, Settings.
+    -->
+    <record id="custom_hr_employee_form_tab_groups" model="ir.ui.view">
+        <field name="name">custom.hr.employee.form.tab.groups</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="98"/>
+        <field name="arch" type="xml">
+            <!-- Ẩn tab Công việc với nhân viên thường.
+                 Các tab khác (Cá nhân, Settings, Payroll) đã có groups trong Odoo 19 gốc. -->
+            <xpath expr="//page[@name='work_information']" position="attributes">
+                <attribute name="groups">hr.group_hr_user</attribute>
+            </xpath>
+            <!-- Ẩn tab CV với nhân viên thường -->
+            <xpath expr="//page[@name='resume']" position="attributes">
+                <attribute name="groups">hr.group_hr_user</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        Priority 98 — Ẩn tab Chứng chỉ (từ hr_skills, inherit riêng) với nhân viên thường.
+        Tab certification nằm trong hr.employee.view.form.inherit.resume nên phải inherit từ đó.
+    -->
+    <record id="custom_hr_employee_form_cert_groups" model="ir.ui.view">
+        <field name="name">custom.hr.employee.form.cert.groups</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_skills.hr_employee_view_form"/>
+        <field name="priority" eval="98"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='certification']" position="attributes">
+                <attribute name="groups">hr.group_hr_user</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

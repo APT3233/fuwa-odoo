@@ -34,5 +34,8 @@ class CustomHrTransferDepartmentWizard(models.TransientModel):
             "created_by_wizard": True,
         })
 
-        employee.write({"department_id": self.department_id.id})
+        # skip_work_history=True: wizard đã tự tạo history bên trên, tránh double-log
+        employee.with_context(skip_work_history=True).write(
+            {"department_id": self.department_id.id}
+        )
         return {"type": "ir.actions.act_window_close"}

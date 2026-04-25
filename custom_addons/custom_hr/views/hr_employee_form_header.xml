@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Priority 90 — Header & Quick Actions
+        QUAN TRỌNG về thứ tự xpath trong record này:
+          1. Xóa h5 gốc TRƯỚC để tránh selector ambiguity
+          2. Sau đó mới thêm header context (có field work_email mới)
+          3. Cuối cùng thêm quick actions
+    -->
+    <record id="custom_hr_employee_form_header" model="ir.ui.view">
+        <field name="name">custom.hr.employee.form.header</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+
+            <!-- STEP 1: Xóa h5 contact/tag gốc TRƯỚC khi thêm block mới.
+                 Dùng //h5[.//field[...]] thay vì ancestor:: để tránh ambiguity
+                 khi cùng field name tồn tại ở nhiều nơi. -->
+            <xpath expr="//h5[.//field[@name='work_email']]" position="replace"/>
+            <xpath expr="//h5[.//field[@name='work_phone']]" position="replace"/>
+            <xpath expr="//h5[.//field[@name='mobile_phone']]" position="replace"/>
+            <xpath expr="//h5[.//field[@name='category_ids']]" position="replace"/>
+
+            <!-- STEP 2: Thêm business context ngay dưới tên nhân viên -->
+            <xpath expr="//div[hasclass('oe_title')]/h1" position="after">
+                <div class="custom_hr_header_context">
+                    <div class="custom_hr_role_line">
+                        <field name="job_title" placeholder="Backend Developer" readonly="1"/>
+                        <span class="custom_hr_sep"> | </span>
+                        <field name="department_id" placeholder="Phòng IT" readonly="1"/>
+                    </div>
+                    <div class="custom_hr_status_line">
+                        <field name="employment_status"
+                               widget="statusbar"
+                               class="custom_hr_status_widget"
+                               options="{'clickable': False}"
+                               readonly="1"/>
+                        <span class="custom_hr_sep"> | </span>
+                        <field name="employment_type" readonly="1"/>
+                    </div>
+                    <div class="custom_hr_meta_line">
+                        <span class="custom_hr_meta_label">Quản lý:</span>
+                        <field name="parent_id" widget="many2one_avatar_employee" readonly="1"/>
+                        <span class="custom_hr_meta_label ms-3">Ngày vào:</span>
+                        <field name="join_date" help="Ngày bắt đầu làm việc chính thức" readonly="1"/>
+                    </div>
+                    <div class="custom_hr_contact_line">
+                        <span class="custom_hr_contact_item">
+                            <i class="fa fa-envelope"/>
+                            <field name="work_email" widget="email"
+                                   placeholder="vd. nguyenvana@congty.com"
+                                   string="Email công việc"
+                                   readonly="1"/>
+                        </span>
+                        <span class="custom_hr_contact_sep">|</span>
+                        <span class="custom_hr_contact_item">
+                            <i class="fa fa-mobile"/>
+                            <field name="mobile_phone" widget="phone"
+                                   placeholder="Di động"
+                                   string="Di động"
+                                   readonly="1"/>
+                        </span>
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- STEP 3: Quick action buttons -->
+            <xpath expr="//div[hasclass('d-flex') and hasclass('flex-column') and hasclass('flex-sm-row') and hasclass('align-items-center')]"
+                   position="after">
+                <div class="custom_hr_quick_actions">
+                    <button name="action_open_transfer_department"
+                            type="object"
+                            string="Chuyển phòng ban"
+                            class="btn btn-outline-secondary"
+                            groups="hr.group_hr_user"/>
+                    <button name="action_open_change_manager"
+                            type="object"
+                            string="Đổi quản lý"
+                            class="btn btn-outline-secondary"
+                            groups="hr.group_hr_user"/>
+                    <button name="action_open_terminate_employee"
+                            type="object"
+                            string="Nghỉ việc"
+                            class="btn btn-outline-danger"
+                            groups="hr.group_hr_manager"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

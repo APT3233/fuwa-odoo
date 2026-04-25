@@ -19,11 +19,13 @@
     "data": [
         "security/ir.model.access.csv",
         "security/hr_employee_rules.xml",
-        "security/access_rules.xml",
+        "security/hr_groups_extend.xml",
         "views/hr_employee_form_inherit.xml",
         "views/hr_homeworking_employee_form_inherit.xml",
         "views/hr_employee_form_header.xml",     # priority 90: header + quick actions
         "views/hr_employee_form_work_tab.xml",   # priority 92+95: overview/work tabs + ordering
+        "views/hr_employee_public_form.xml",     # priority 92+98: public form for non-HR users
+        "views/hr_menu_restrict.xml",            # restrict menus for non-HR users
         "views/hr_employee_vn_fields.xml",
         "views/hr_employee_insurance_tab.xml",
         "views/hr_employee_tax_tab.xml",

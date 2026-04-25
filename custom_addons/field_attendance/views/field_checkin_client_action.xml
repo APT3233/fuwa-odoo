@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Client action: mở OWL component chấm công công tác trên mobile -->
+    <record id="action_field_checkin_client" model="ir.actions.client">
+        <field name="name">Chấm công công tác</field>
+        <field name="tag">field_attendance.checkin</field>
+        <field name="target">fullscreen</field>
+    </record>
+</odoo>

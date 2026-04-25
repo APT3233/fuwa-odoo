@@ -2,10 +2,12 @@
 *
 !.gitignore
 !README.md
+!.env.example
 !docker-compose.yml
 !Dockerfile
 !postgres.conf
 !requirements.txt
+!deploy.py
 
 # custom_addons — track toàn bộ
 !custom_addons/

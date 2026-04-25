@@ -2,8 +2,11 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 from odoo import api, models, tools
-from odoo.osv import expression
+from odoo.fields import Domain
 from odoo.tools import config
+
+# odoo.osv.expression is deprecated since Odoo 19; use odoo.fields.Domain instead
+expression = Domain  # backward-compat alias: expression.AND → Domain.AND
 
 
 class IrRule(models.Model):

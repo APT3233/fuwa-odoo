@@ -1,0 +1,455 @@
+// ============================================================
+// Quá trình công tác — Timeline layout in HR form view
+// ============================================================
+.o_att_timeline {
+    padding: 8px 0 4px;
+
+    .o_att_timeline_item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+
+        &:last-child .o_att_line_bar {
+            display: none;
+        }
+    }
+
+    .o_att_timeline_line {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 20px;
+        flex-shrink: 0;
+        padding-top: 3px;
+
+        .o_att_dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px currentColor;
+
+            &.o_att_dot_in  { background: #28a745; color: #28a745; }
+            &.o_att_dot_out { background: #dc3545; color: #dc3545; }
+        }
+        .o_att_line_bar {
+            flex: 1;
+            width: 2px;
+            background: #dee2e6;
+            margin-top: 4px;
+            min-height: 40px;
+        }
+    }
+
+    .o_att_timeline_card {
+        flex: 1;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px 14px;
+        min-width: 0;
+
+        .o_att_card_header {
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+    }
+
+    .o_att_media_row {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+        align-items: stretch;
+
+        .o_att_selfie_box,
+        .o_att_map_box {
+            flex: 1;
+            min-width: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #e9ecef;
+            aspect-ratio: 1 / 1;
+            // Mobile: small
+            max-height: 180px;
+
+            img, iframe {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover;
+                display: block;
+                border: none;
+            }
+        }
+    }
+
+    // Desktop: larger boxes
+    @media (min-width: 768px) {
+        .o_att_timeline_card {
+            padding: 16px 20px;
+        }
+        .o_att_media_row {
+            gap: 16px;
+
+            .o_att_selfie_box,
+            .o_att_map_box {
+                max-height: 300px;
+            }
+        }
+    }
+}
+
+// Field Attendance — Mobile check-in UI
+// position: fixed để thoát khỏi overflow:hidden của Odoo wrapper
+.o_field_checkin {
+    position: fixed;
+    top: 46px; // Odoo navbar height
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #f4f6f8;
+    padding: 12px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+    font-family: system-ui, -apple-system, sans-serif;
+
+    .o_fc_loading,
+    .o_fc_submitting {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+    .o_fc_container {
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    // -------- Header --------
+    .o_fc_header {
+        background: #fff;
+        border-radius: 12px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+
+        .o_fc_avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e0e0e0;
+        }
+        .o_fc_employee_info {
+            flex: 1;
+            .o_fc_name {
+                font-weight: 600;
+                font-size: 16px;
+                color: #222;
+            }
+            .o_fc_dept {
+                font-size: 13px;
+                color: #888;
+            }
+        }
+    }
+
+    // -------- GPS bar --------
+    .o_fc_gps_bar {
+        background: #fff;
+        border-radius: 8px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+        .fa-map-marker {
+            color: #e74c3c;
+            font-size: 16px;
+        }
+    }
+
+    .o_fc_error {
+        margin-bottom: 0;
+    }
+
+    .o_fc_open_att {
+        margin-bottom: 0;
+        font-size: 13px;
+    }
+
+    // -------- Camera stage --------
+    .o_fc_camera_stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+
+        .o_fc_video_wrapper {
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .o_fc_video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                // Mirror for selfie view (user-facing camera)
+                transform: scaleX(-1);
+            }
+        }
+
+        .o_fc_capture_btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border-radius: 12px;
+        }
+        .o_fc_cancel_btn {
+            width: 100%;
+            border-radius: 10px;
+        }
+    }
+
+    // -------- Preview stage --------
+    .o_fc_preview_stage {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+
+        .o_fc_selfie_preview {
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        .o_fc_note_input {
+            background: #fff;
+            padding: 12px;
+            border-radius: 12px;
+
+            label {
+                display: block;
+                font-size: 13px;
+                color: #666;
+                margin-bottom: 6px;
+            }
+            textarea {
+                width: 100%;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                padding: 8px;
+                font-size: 14px;
+                resize: none;
+            }
+        }
+
+        .o_fc_actions {
+            display: flex;
+            gap: 8px;
+
+            .btn {
+                flex: 1;
+                padding: 14px;
+                font-size: 15px;
+                border-radius: 10px;
+            }
+            .btn-lg {
+                flex: 2;
+            }
+        }
+
+        .o_fc_checkout_no_selfie {
+            text-align: center;
+        }
+    }
+
+    // -------- Register location stage --------
+    .o_fc_reg_stage {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .o_fc_reg_header {
+        background: #5b4fcf;
+        color: #fff;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 17px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .fa { font-size: 20px; }
+    }
+
+    .o_fc_reg_gps_info {
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        color: #2e7d32;
+    }
+
+    .o_fc_reg_form {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .o_fc_reg_field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            font-size: 14px;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+
+            &:focus {
+                border-color: #5b4fcf;
+                box-shadow: 0 0 0 3px rgba(91, 79, 207, 0.12);
+            }
+        }
+    }
+
+    .o_fc_partner_search {
+        position: relative;
+    }
+
+    .o_fc_partner_dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0; right: 0;
+        z-index: 100;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        margin-top: 2px;
+    }
+
+    .o_fc_partner_item {
+        padding: 10px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+
+        &:last-child { border-bottom: none; }
+        &:hover { background: #f4f0ff; }
+    }
+
+    .o_fc_partner_selected {
+        margin-top: 6px;
+        font-size: 13px;
+        color: #2e7d32;
+        font-weight: 500;
+    }
+
+    .o_fc_reg_actions {
+        display: flex;
+        gap: 10px;
+        padding-top: 4px;
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+    }
+
+    .o_fc_reg_loc_btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 15px;
+        border-radius: 10px;
+        border-color: #5b4fcf;
+        color: #5b4fcf;
+
+        &:hover {
+            background: #5b4fcf;
+            color: #fff;
+        }
+    }
+
+    // -------- Done stage --------
+    .o_fc_done_stage {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: center;
+
+        .alert {
+            width: 100%;
+            text-align: center;
+
+            h4 {
+                margin-top: 8px;
+                margin-bottom: 4px;
+            }
+            .fa-2x {
+                display: block;
+                margin-bottom: 6px;
+            }
+        }
+
+        .o_fc_done_map {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 10px;
+        }
+    }
+}

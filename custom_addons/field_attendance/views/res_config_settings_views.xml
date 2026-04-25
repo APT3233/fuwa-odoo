@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_field_attendance" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.field.attendance</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_attendance.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='hr_attendance']" position="inside">
+                <block title="Chấm công công tác (Field Attendance)"
+                    name="field_attendance_container">
+                    <setting id="field_google_maps_key"
+                        string="Google Maps API Key"
+                        help="Dùng để nhúng bản đồ vào form xem chấm công. Lấy tại Google Cloud Console → Maps Embed API">
+                        <field name="google_maps_api_key" placeholder="AIza..."/>
+                    </setting>
+                    <setting id="field_default_radius"
+                        string="Bán kính check-in mặc định"
+                        help="Bán kính (mét) mặc định cho các địa điểm chấm công mới">
+                        <field name="attendance_default_radius"/>
+                        <span> mét</span>
+                    </setting>
+                    <setting id="field_office_latitude"
+                        string="Vị trí văn phòng chính"
+                        help="Tọa độ GPS văn phòng chính (dùng làm mặc định khi chưa cấu hình attendance.location)">
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="office_latitude"/>
+                                <field name="office_latitude" placeholder="10.7626"/>
+                            </div>
+                            <div class="col-6">
+                                <label for="office_longitude"/>
+                                <field name="office_longitude" placeholder="106.6602"/>
+                            </div>
+                        </div>
+                    </setting>
+                    <setting id="field_office_radius"
+                        string="Bán kính văn phòng chính">
+                        <field name="attendance_radius"/>
+                        <span> mét</span>
+                    </setting>
+                    <setting id="field_require_selfie_checkout"
+                        string="Yêu cầu selfie khi check-out"
+                        help="Nếu bật: nhân viên phải chụp selfie cả khi check-out. Mặc định: chỉ bắt buộc selfie khi check-in">
+                        <field name="attendance_require_selfie_checkout"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

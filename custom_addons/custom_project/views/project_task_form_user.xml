@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Tắt quick_create trong My Tasks kanban cho Người dùng.
+        Người dùng chỉ được kéo task (write personal_stage), không tạo mới.
+    -->
+    <record id="view_task_mytasks_kanban_no_create" model="ir.ui.view">
+        <field name="name">project.task.mytasks.kanban.no.create</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_kanban_with_stage"/>
+        <field name="arch" type="xml">
+            <kanban position="attributes">
+                <attribute name="quick_create">false</attribute>
+            </kanban>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_contract_view_form" model="ir.ui.view">
+        <field name="name">hr.contract.form</field>
+        <field name="model">hr.contract</field>
+        <field name="arch" type="xml">
+            <form string="Contract">
+                <header>
+                    <button name="action_confirm" string="Running" type="object" invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_close" string="Expire" type="object" invisible="state != 'open'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state == 'cancel'"/>
+                    <button name="action_draft" string="Reset to Draft" type="object" invisible="state not in ('close', 'cancel')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,close"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="employee_id"/>
+                            <field name="job_id"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group name="salary">
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="wage"/>
+                            <field name="resource_calendar_id"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_contract_view_list" model="ir.ui.view">
+        <field name="name">hr.contract.list</field>
+        <field name="model">hr.contract</field>
+        <field name="arch" type="xml">
+            <list string="Employee Contracts">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="wage"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_contract_view_search" model="ir.ui.view">
+        <field name="name">hr.contract.search</field>
+        <field name="model">hr.contract</field>
+        <field name="arch" type="xml">
+            <search string="Contracts">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <filter string="Running" name="open" domain="[('state', '=', 'open')]"/>
+                <filter string="New" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Expired" name="close" domain="[('state', '=', 'close')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_contract" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">hr.contract</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_hr_contract" name="Contracts"
+        parent="hr.menu_hr_employee_payroll"
+        action="action_hr_contract"
+        groups="hr.group_hr_user"
+        sequence="10"/>
+</odoo>

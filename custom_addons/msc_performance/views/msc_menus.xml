@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1 root menu duy nhất, không restrict groups
+         Odoo tự redirect vào sub-menu đầu tiên visible của từng user -->
+    <menuitem id="menu_msc_root"
+              name="Đánh giá MSC"
+              sequence="50"/>
+
+    <!-- MSC của tôi: nhân viên + Trưởng CN (manager_only) + Trưởng phòng (bul_only)
+         PMO/HR KHÔNG có marker group này nên không thấy menu -->
+    <menuitem id="menu_msc_my"
+              name="MSC của tôi"
+              parent="menu_msc_root"
+              action="action_my_msc"
+              sequence="5"
+              groups="msc_performance.group_msc_user,msc_performance.group_msc_manager_only,msc_performance.group_msc_bul_only"/>
+
+    <!-- Tất cả bản ghi: Quản lý trở lên, sequence=10 → xuất hiện đầu tiên cho manager -->
+    <menuitem id="menu_msc_all_records"
+              name="Tất cả bản ghi"
+              parent="menu_msc_root"
+              action="action_msc_all_records"
+              sequence="10"
+              groups="msc_performance.group_msc_manager"/>
+
+    <!-- Bảng đánh giá xếp loại: Giám đốc chi nhánh trở lên -->
+    <menuitem id="menu_msc_bul_dashboard"
+              name="Bảng đánh giá xếp loại"
+              parent="menu_msc_root"
+              action="action_msc_bul_dashboard"
+              sequence="25"
+              groups="msc_performance.group_msc_bul"/>
+
+    <!-- Đơn vị kinh doanh: Quản lý trở lên -->
+    <menuitem id="menu_msc_business_unit"
+              name="Đơn vị kinh doanh"
+              parent="menu_msc_root"
+              action="action_msc_business_unit"
+              sequence="30"
+              groups="msc_performance.group_msc_manager"/>
+
+    <!-- Cấu hình: Quản lý trở lên -->
+    <menuitem id="menu_msc_config"
+              name="Cấu hình"
+              parent="menu_msc_root"
+              sequence="90"
+              groups="msc_performance.group_msc_manager"/>
+
+    <menuitem id="menu_msc_period"
+              name="Chu kỳ MSC"
+              parent="menu_msc_config"
+              action="action_msc_period"
+              sequence="10"
+              groups="msc_performance.group_msc_manager"/>
+</odoo>

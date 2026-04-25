@@ -14,7 +14,8 @@ class CustomHrWorkHistory(models.Model):
         ondelete="cascade",
         index=True,
     )
-    start_date = fields.Date(string="Từ ngày", required=True)
+    # index=True: hỗ trợ sort theo (employee_id, start_date desc) hiệu quả
+    start_date = fields.Date(string="Từ ngày", required=True, index=True)
     end_date = fields.Date(string="Đến ngày")
     department_id = fields.Many2one("hr.department", string="Phòng ban")
     job_id = fields.Many2one("hr.job", string="Chức danh")
@@ -38,7 +39,8 @@ class CustomHrWorkHistory(models.Model):
 
 
 class HrEmployeeWorkHistoryLink(models.Model):
-    """Link One2many vào hr.employee."""
+    """Gắn One2many work_history_ids vào hr.employee và xử lý auto-logging."""
+
     _inherit = "hr.employee"
 
     work_history_ids = fields.One2many(
@@ -49,7 +51,11 @@ class HrEmployeeWorkHistoryLink(models.Model):
     )
 
     def _create_work_history_entry(self, change_reason="transfer", note=""):
-        """Tạo bản ghi lịch sử công tác từ trạng thái hiện tại của nhân viên."""
+        """Tạo bản ghi lịch sử công tác từ trạng thái HIỆN TẠI của nhân viên.
+
+        Luôn gọi TRƯỚC khi thay đổi department_id / parent_id / job_id để
+        bản ghi phản ánh đúng trạng thái cũ.
+        """
         self.ensure_one()
         self.env["custom_hr.work.history"].create({
             "employee_id": self.id,
@@ -62,3 +68,36 @@ class HrEmployeeWorkHistoryLink(models.Model):
             "note": note,
             "created_by_wizard": True,
         })
+
+    def write(self, vals):
+        """Auto-tạo work history khi department/manager thay đổi trực tiếp.
+
+        Bỏ qua nếu context có skip_work_history=True (wizard đã tự log).
+        """
+        if not self.env.context.get("skip_work_history"):
+            _TRIGGERS = frozenset({"department_id", "parent_id", "job_id", "job_title"})
+            if _TRIGGERS & set(vals.keys()):
+                for record in self:
+                    new_dept_id = vals.get("department_id")
+                    new_mgr_id = vals.get("parent_id")
+                    new_job_id = vals.get("job_id")
+
+                    if new_dept_id and new_dept_id != record.department_id.id:
+                        dept_name = self.env["hr.department"].browse(new_dept_id).name
+                        record._create_work_history_entry(
+                            change_reason="transfer",
+                            note=f"Chuyển sang: {dept_name}",
+                        )
+                    elif new_mgr_id and new_mgr_id != record.parent_id.id:
+                        mgr_name = self.env["hr.employee"].browse(new_mgr_id).name
+                        record._create_work_history_entry(
+                            change_reason="other",
+                            note=f"Đổi quản lý: {mgr_name}",
+                        )
+                    elif new_job_id and new_job_id != record.job_id.id:
+                        job_name = self.env["hr.job"].browse(new_job_id).name
+                        record._create_work_history_entry(
+                            change_reason="other",
+                            note=f"Đổi chức danh: {job_name}",
+                        )
+        return super().write(vals)

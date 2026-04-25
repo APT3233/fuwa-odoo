@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_msc_period_form" model="ir.ui.view">
+        <field name="name">msc.period.form</field>
+        <field name="model">msc.period</field>
+        <field name="arch" type="xml">
+            <form string="Chu kỳ MSC">
+                <header>
+                    <button name="action_open" string="Mở chu kỳ" type="object"
+                            invisible="state != 'draft'"
+                            class="btn-primary"/>
+                    <button name="action_close" string="Đóng chu kỳ" type="object"
+                            invisible="state != 'open'"
+                            class="btn-secondary"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_records" type="object"
+                                class="oe_stat_button" icon="fa-list">
+                            <field name="record_count" widget="statinfo"
+                                   string="Bản ghi"/>
+                        </button>
+                    </div>
+                    <h1><field name="name" placeholder="Tên chu kỳ (tự động nếu để trống)"/></h1>
+                    <group>
+                        <group string="Thông tin chu kỳ">
+                            <field name="year"/>
+                            <field name="month"/>
+                        </group>
+                    </group>
+                    <group string="Thời gian nộp mục tiêu">
+                        <group>
+                            <field name="date_submit_open" string="Mở"/>
+                            <field name="date_submit_close" string="Đóng"/>
+                        </group>
+                        <group>
+                            <field name="date_auto_confirm"/>
+                        </group>
+                    </group>
+                    <group string="Thời gian nộp kết quả">
+                        <group>
+                            <field name="date_result_open" string="Mở"/>
+                            <field name="date_result_close" string="Đóng"/>
+                        </group>
+                        <group>
+                            <field name="date_auto_approve"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_msc_period_list" model="ir.ui.view">
+        <field name="name">msc.period.list</field>
+        <field name="model">msc.period</field>
+        <field name="arch" type="xml">
+            <list string="Chu kỳ MSC">
+                <field name="name"/>
+                <field name="year"/>
+                <field name="month"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'open'"
+                       decoration-muted="state == 'closed'"/>
+                <field name="date_submit_open"/>
+                <field name="date_submit_close"/>
+                <field name="date_result_open"/>
+                <field name="date_result_close"/>
+                <field name="record_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_msc_period" model="ir.actions.act_window">
+        <field name="name">Chu kỳ MSC</field>
+        <field name="res_model">msc.period</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

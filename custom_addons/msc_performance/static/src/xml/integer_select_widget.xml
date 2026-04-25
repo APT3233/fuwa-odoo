@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="msc_performance.IntegerSelectWidget">
+        <t t-if="props.readonly">
+            <span class="o_field_widget o_field_integer">
+                <t t-esc="currentValue"/>
+            </span>
+        </t>
+        <t t-else="">
+            <select class="o_input msc_integer_select"
+                    t-on-change="onChange"
+                    t-att-disabled="props.readonly ? 'disabled' : undefined">
+                <t t-foreach="options" t-as="opt" t-key="opt">
+                    <option t-att-value="opt"
+                            t-att-selected="opt === currentValue ? 'selected' : undefined">
+                        <t t-esc="opt"/>
+                    </option>
+                </t>
+            </select>
+        </t>
+    </t>
+</templates>

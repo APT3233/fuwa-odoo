@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="field_attendance.FieldCheckIn">
+        <div class="o_field_checkin">
+
+            <!-- Loading -->
+            <div t-if="state.loading" class="o_fc_loading">
+                <i class="fa fa-spinner fa-spin fa-3x"/>
+                <p>Đang tải...</p>
+            </div>
+
+            <!-- Main content -->
+            <div t-else="" class="o_fc_container">
+
+                <!-- Header: employee info + mode badge -->
+                <div class="o_fc_header" t-if="state.employee">
+                    <img class="o_fc_avatar" t-att-src="state.employee.avatar"/>
+                    <div class="o_fc_employee_info">
+                        <div class="o_fc_name"><t t-esc="state.employee.name"/></div>
+                        <div class="o_fc_dept"><t t-esc="state.employee.job or state.employee.department"/></div>
+                    </div>
+                    <div class="o_fc_mode">
+                        <span t-if="isCheckedIn" class="badge bg-warning">Đang làm việc</span>
+                        <span t-else="" class="badge bg-secondary">Chưa check-in</span>
+                    </div>
+                </div>
+
+                <!-- GPS info bar -->
+                <div class="o_fc_gps_bar">
+                    <i class="fa fa-map-marker"/>
+                    <span t-if="state.latitude">
+                        <t t-esc="state.latitude.toFixed(6)"/>, <t t-esc="state.longitude.toFixed(6)"/>
+                        <small class="text-muted"> (±<t t-esc="state.accuracy"/>m)</small>
+                    </span>
+                    <span t-elif="state.gpsError" class="text-danger">
+                        <t t-esc="state.gpsError"/>
+                    </span>
+                    <span t-else="" class="text-muted">Đang lấy GPS...</span>
+                    <button class="btn btn-sm btn-link" t-on-click="refreshGps">
+                        <i class="fa fa-refresh"/>
+                    </button>
+                </div>
+
+                <!-- Error banner -->
+                <div t-if="state.error" class="alert alert-danger o_fc_error">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+
+                <!-- Open attendance info (đang check-in) -->
+                <div t-if="isCheckedIn and state.stage !== 'done'"
+                    class="alert alert-info o_fc_open_att">
+                    <strong>Phiên hiện tại:</strong>
+                    Check-in lúc <t t-esc="state.openAttendance.check_in"/>
+                    <span t-if="state.openAttendance.check_in_location">
+                        @ <t t-esc="state.openAttendance.check_in_location"/>
+                    </span>
+                </div>
+
+                <!-- STAGE: camera -->
+                <div t-if="state.stage === 'camera'" class="o_fc_camera_stage">
+                    <div class="o_fc_video_wrapper">
+                        <video t-ref="video" autoplay="true" playsinline="true" muted="true"
+                            class="o_fc_video"/>
+                    </div>
+                    <canvas t-ref="canvas" style="display: none;"/>
+                    <button class="btn btn-primary btn-lg o_fc_capture_btn" t-on-click="captureSelfie">
+                        <i class="fa fa-camera"/> Chụp ảnh
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm o_fc_cancel_btn"
+                        t-on-click="cancel">
+                        <i class="fa fa-times"/> Hủy
+                    </button>
+                </div>
+
+                <!-- STAGE: preview (sau khi chụp) -->
+                <div t-if="state.stage === 'preview'" class="o_fc_preview_stage">
+                    <div class="o_fc_selfie_preview">
+                        <img t-att-src="state.selfieDataUrl"/>
+                    </div>
+
+                    <div class="o_fc_note_input">
+                        <label>Ghi chú (tùy chọn):</label>
+                        <textarea t-model="state.note" rows="2"
+                            placeholder="VD: Gặp khách hàng ABC..."/>
+                    </div>
+
+                    <div class="o_fc_actions">
+                        <button class="btn btn-outline-secondary" t-on-click="cancel">
+                            <i class="fa fa-times"/> Hủy
+                        </button>
+                        <button class="btn btn-secondary" t-on-click="retake">
+                            <i class="fa fa-refresh"/> Chụp lại
+                        </button>
+                        <button t-if="!isCheckedIn" class="btn btn-success btn-lg"
+                            t-on-click="submitCheckIn">
+                            <i class="fa fa-sign-in"/> Check-in
+                        </button>
+                        <button t-if="isCheckedIn" class="btn btn-danger btn-lg"
+                            t-on-click="submitCheckOut">
+                            <i class="fa fa-sign-out"/> Check-out
+                        </button>
+                    </div>
+
+                    <!-- Check-out không bắt buộc selfie -->
+                    <div t-if="isCheckedIn and !state.requireSelfieCheckout"
+                        class="o_fc_checkout_no_selfie">
+                        <button class="btn btn-outline-danger btn-sm"
+                            t-on-click="submitCheckOut">
+                            Hoặc check-out nhanh (không ảnh)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STAGE: submitting -->
+                <div t-if="state.stage === 'submitting'" class="o_fc_submitting">
+                    <i class="fa fa-spinner fa-spin fa-3x"/>
+                    <p>Đang gửi dữ liệu...</p>
+                </div>
+
+                <!-- STAGE: done -->
+                <div t-if="state.stage === 'done' and state.result" class="o_fc_done_stage">
+                    <div t-if="state.result.is_valid" class="alert alert-success">
+                        <i class="fa fa-check-circle fa-2x"/>
+                        <h4>Thành công!</h4>
+                        <p><t t-esc="state.result.message"/></p>
+                    </div>
+                    <div t-else="" class="alert alert-warning">
+                        <i class="fa fa-exclamation-circle fa-2x"/>
+                        <h4>Đã ghi nhận</h4>
+                        <p><t t-esc="state.result.message"/></p>
+                        <small>Cách địa điểm gần nhất: <t t-esc="state.result.distance"/>m</small>
+                    </div>
+
+                    <div class="o_fc_done_map" t-if="mapEmbedUrl">
+                        <iframe t-att-src="mapEmbedUrl"
+                            width="100%" height="300"
+                            frameborder="0" style="border:0;"
+                            allowfullscreen="true"/>
+                    </div>
+
+                    <!-- Nút đăng ký địa điểm mới (chỉ hiện khi ngoài bán kính) -->
+                    <button t-if="!state.result.is_valid"
+                        class="btn btn-outline-primary btn-lg o_fc_reg_loc_btn"
+                        t-on-click="startRegisterLocation">
+                        <i class="fa fa-map-marker"/> Đăng ký địa điểm công tác
+                    </button>
+
+                    <button class="btn btn-primary btn-lg" t-on-click="goHome">
+                        <i class="fa fa-check"/> Hoàn thành
+                    </button>
+                </div>
+
+                <!-- STAGE: register_location -->
+                <div t-if="state.stage === 'register_location'" class="o_fc_reg_stage">
+                    <div class="o_fc_reg_header">
+                        <i class="fa fa-map-marker-alt"/>
+                        <span>Đăng ký địa điểm công tác</span>
+                    </div>
+
+                    <!-- GPS hiện tại -->
+                    <div class="o_fc_reg_gps_info">
+                        <i class="fa fa-crosshairs text-success"/>
+                        <span>Toạ độ: <strong><t t-esc="state.latitude and state.latitude.toFixed(6)"/>, <t t-esc="state.longitude and state.longitude.toFixed(6)"/></strong></span>
+                        <small class="text-muted"> (tự động từ GPS check-in)</small>
+                    </div>
+
+                    <div t-if="state.regError" class="alert alert-danger o_fc_error">
+                        <i class="fa fa-exclamation-triangle"/> <t t-esc="state.regError"/>
+                    </div>
+
+                    <div t-if="state.regDone" class="alert alert-success">
+                        <i class="fa fa-check-circle"/> Đăng ký thành công!
+                        <button class="btn btn-success btn-lg mt-2 w-100" t-on-click="goHome">
+                            <i class="fa fa-check"/> Hoàn thành
+                        </button>
+                    </div>
+
+                    <div t-if="!state.regDone" class="o_fc_reg_form">
+                        <!-- Tên địa điểm -->
+                        <div class="o_fc_reg_field">
+                            <label>Tên địa điểm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control"
+                                placeholder="VD: Công ty ABC, Chi nhánh Đà Nẵng..."
+                                t-model="state.regName"/>
+                        </div>
+
+                        <!-- Loại -->
+                        <div class="o_fc_reg_field">
+                            <label>Loại <span class="text-danger">*</span></label>
+                            <select class="form-select" t-model="state.regType">
+                                <option value="customer">Khách hàng</option>
+                                <option value="site">Công trường</option>
+                                <option value="branch">Chi nhánh</option>
+                                <option value="office">Văn phòng</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+
+                        <!-- Khách hàng (chỉ hiện khi type = customer) -->
+                        <div t-if="state.regType === 'customer'" class="o_fc_reg_field">
+                            <label>Khách hàng</label>
+                            <div class="o_fc_partner_search">
+                                <input type="text" class="form-control"
+                                    placeholder="Nhập tên để tìm kiếm..."
+                                    t-att-value="state.regPartnerName"
+                                    t-on-input="onPartnerInput"/>
+                                <div t-if="state.regPartnerResults.length > 0"
+                                    class="o_fc_partner_dropdown">
+                                    <div t-foreach="state.regPartnerResults" t-as="p"
+                                        t-key="p.id"
+                                        class="o_fc_partner_item"
+                                        t-on-click="() => selectPartner(p)">
+                                        <i class="fa fa-building-o me-2 text-muted"/>
+                                        <t t-esc="p.name"/>
+                                    </div>
+                                </div>
+                                <div t-if="state.regPartnerId" class="o_fc_partner_selected">
+                                    <i class="fa fa-check-circle text-success me-1"/>
+                                    <t t-esc="state.regPartnerName"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="o_fc_reg_field">
+                            <label>Địa chỉ</label>
+                            <input type="text" class="form-control"
+                                placeholder="Số nhà, đường, quận, thành phố..."
+                                t-model="state.regAddress"/>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="o_fc_reg_actions">
+                            <button class="btn btn-outline-secondary"
+                                t-on-click="cancelRegisterLocation"
+                                t-att-disabled="state.regSubmitting">
+                                <i class="fa fa-arrow-left"/> Quay lại
+                            </button>
+                            <button class="btn btn-primary"
+                                t-on-click="submitRegisterLocation"
+                                t-att-disabled="state.regSubmitting">
+                                <i t-if="state.regSubmitting" class="fa fa-spinner fa-spin"/>
+                                <i t-else="" class="fa fa-save"/>
+                                Đăng ký
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </t>
+</templates>

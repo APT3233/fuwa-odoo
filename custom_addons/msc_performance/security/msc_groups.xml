@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Privilege (nhóm danh mục) cho MSC -->
+    <record id="res_groups_privilege_msc" model="res.groups.privilege">
+        <field name="name">MSC Performance</field>
+        <field name="sequence">50</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <!-- Thành viên: chỉ xem/tạo bản ghi của mình, thấy "MSC của tôi"
+         KHÔNG implied gì cả — hoàn toàn tách biệt khỏi implied chain của manager -->
+    <record id="group_msc_user" model="res.groups">
+        <field name="name">Thành viên</field>
+        <field name="privilege_id" ref="res_groups_privilege_msc"/>
+        <field name="sequence">10</field>
+        <field name="implied_ids" eval="[]"/>
+    </record>
+
+    <!-- Quản lý: xem + xác nhận/phê duyệt nhân viên trong department -->
+    <record id="group_msc_manager" model="res.groups">
+        <field name="name">Quản lý</field>
+        <field name="privilege_id" ref="res_groups_privilege_msc"/>
+        <field name="sequence">20</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- group_msc_manager_only: marker group chỉ gán cho Quản lý thuần.
+         BUL/HR KHÔNG implied group này → dùng để ẩn nút phê duyệt kết quả với BUL/HR. -->
+    <record id="group_msc_manager_only" model="res.groups">
+        <field name="name">Quản lý (chỉ phê duyệt kết quả)</field>
+        <field name="implied_ids" eval="[]"/>
+    </record>
+
+    <!-- group_msc_bul_only: marker group chỉ gán cho BUL thuần.
+         PMO/HR KHÔNG implied group này → dùng để ẩn nút "Hủy phê duyệt" BUL với PMO/HR. -->
+    <record id="group_msc_bul_only" model="res.groups">
+        <field name="name">Trưởng phòng (chỉ hủy phê duyệt)</field>
+        <field name="implied_ids" eval="[]"/>
+    </record>
+
+    <!-- Trưởng phòng Kinh Doanh (BUL): phê duyệt sau Trưởng CN -->
+    <record id="group_msc_bul" model="res.groups">
+        <field name="name">Trưởng phòng Kinh Doanh</field>
+        <field name="privilege_id" ref="res_groups_privilege_msc"/>
+        <field name="sequence">30</field>
+        <field name="implied_ids" eval="[(4, ref('group_msc_manager'))]"/>
+    </record>
+
+    <!-- group_msc_pmo_only: marker group chỉ gán cho PMO thuần.
+         HR KHÔNG implied group này → dùng để ẩn nút PMO với HR. -->
+    <record id="group_msc_pmo_only" model="res.groups">
+        <field name="name">PMO (chỉ phê duyệt)</field>
+        <field name="implied_ids" eval="[]"/>
+    </record>
+
+    <!-- PMO: phê duyệt sau Trưởng phòng, phê duyệt trực tiếp Sale Admin -->
+    <record id="group_msc_pmo" model="res.groups">
+        <field name="name">PMO</field>
+        <field name="privilege_id" ref="res_groups_privilege_msc"/>
+        <field name="sequence">35</field>
+        <field name="implied_ids" eval="[(4, ref('group_msc_bul'))]"/>
+    </record>
+
+    <!-- HR Admin: toàn quyền, xác nhận cuối, cấu hình -->
+    <record id="group_msc_admin" model="res.groups">
+        <field name="name">HR Admin</field>
+        <field name="privilege_id" ref="res_groups_privilege_msc"/>
+        <field name="sequence">40</field>
+        <field name="implied_ids" eval="[(4, ref('group_msc_pmo'))]"/>
+    </record>
+</odoo>

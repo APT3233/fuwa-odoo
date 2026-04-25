@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Priority 125 — Vietnamese labels: deep personal tab + OCA form/search labels
+    ─────────────────────────────────────────────────────────────────────────────
+    Load sau hr_employee_vn_labels.xml (priority 120).
+    Chứa:
+      1. Labels chi tiết trong Personal tab (group strings, field strings, placeholders)
+      2. Labels OCA Documents stat button (duy nhất — đã xóa khỏi priority 120)
+      3. Labels OCA Medical full (stat button + actions + menus + wizard + form + search)
+      4. Labels bổ sung Attendance (tooltip)
+-->
 <odoo>
-    <!-- Core HR: deeper Vietnamese labels in Personal tab -->
+    <!-- ── 1. Personal tab: labels chi tiết ──────────────────────────────── -->
     <record id="custom_hr_employee_vn_labels_personal_deep" model="ir.ui.view">
         <field name="name">custom.hr.employee.vn.labels.personal.deep</field>
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="priority" eval="125"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='personal_information']//group[.//field[@name='private_email']]" position="attributes">
+            <xpath expr="//page[@name='personal_information']//group[.//field[@name='private_email']]"
+                   position="attributes">
                 <attribute name="string">Liên hệ cá nhân</attribute>
             </xpath>
             <xpath expr="//span[@invisible='is_trusted_bank_account']" position="replace">
@@ -15,9 +26,6 @@
             </xpath>
             <xpath expr="//span[@invisible='not is_trusted_bank_account']" position="replace">
                 <span class="text-success" invisible="not is_trusted_bank_account">Đã xác thực</span>
-            </xpath>
-            <xpath expr="//group[@name='hr_birth_group']" position="attributes">
-                <attribute name="string">Thông tin cá nhân</attribute>
             </xpath>
             <xpath expr="//field[@name='place_of_birth']" position="attributes">
                 <attribute name="placeholder">Thành phố</attribute>
@@ -28,7 +36,8 @@
             <xpath expr="//field[@name='sex']" position="attributes">
                 <attribute name="string">Giới tính</attribute>
             </xpath>
-            <xpath expr="//page[@name='personal_information']//group[.//field[@name='emergency_contact']]" position="attributes">
+            <xpath expr="//page[@name='personal_information']//group[.//field[@name='emergency_contact']]"
+                   position="attributes">
                 <attribute name="string">Liên hệ khẩn cấp</attribute>
             </xpath>
             <xpath expr="//field[@name='emergency_contact']" position="attributes">
@@ -37,7 +46,8 @@
             <xpath expr="//field[@name='emergency_phone']" position="attributes">
                 <attribute name="string">Điện thoại</attribute>
             </xpath>
-            <xpath expr="//group[.//field[@name='visa_no'] and .//field[@name='permit_no']]" position="attributes">
+            <xpath expr="//group[.//field[@name='visa_no'] and .//field[@name='permit_no']]"
+                   position="attributes">
                 <attribute name="string">Visa &amp; Giấy phép lao động</attribute>
             </xpath>
             <xpath expr="//label[@for='visa_expire']" position="attributes">
@@ -64,26 +74,25 @@
         </field>
     </record>
 
-    <!-- HR Attendance: Monthly Hours label + help -->
+    <!-- ── 2. Attendance: tooltip bổ sung ───────────────────────────────── -->
     <record id="custom_hr_employee_vn_labels_attendance_deep" model="ir.ui.view">
         <field name="name">custom.hr.employee.vn.labels.attendance.deep</field>
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr_attendance.view_employee_form_inherit_hr_attendance"/>
         <field name="priority" eval="125"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_open_last_month_attendances']" position="attributes">
+            <xpath expr="//button[@name='action_open_last_month_attendances']"
+                   position="attributes">
                 <attribute name="help">Giờ làm trong tháng</attribute>
             </xpath>
-            <xpath expr="//button[@name='action_open_last_month_attendances']//span[@class='o_stat_text']" position="replace">
+            <xpath expr="//button[@name='action_open_last_month_attendances']//span[hasclass('o_stat_text')]"
+                   position="replace">
                 <span class="o_stat_text">Giờ làm tháng</span>
             </xpath>
         </field>
     </record>
 
-    <!-- OCA: Relatives — đã xử lý trong hr_employee_vn_labels.xml, bỏ duplicate -->
-
-
-    <!-- OCA: Documents stat button + attachment search -->
+    <!-- ── 3. OCA Documents: stat button (employee + public) + search ────── -->
     <record id="custom_hr_employee_vn_labels_documents_deep" model="ir.ui.view">
         <field name="name">custom.hr.employee.vn.labels.documents.deep</field>
         <field name="model">hr.employee</field>
@@ -120,27 +129,32 @@
         </field>
     </record>
 
-    <!-- OCA: Medical Examinations (actions + menus) -->
-    <record id="hr_employee_medical_examination.hr_employee_medical_examination_act_window" model="ir.actions.act_window">
+    <!-- ── 4. OCA Medical: actions + menus + views đầy đủ ───────────────── -->
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_act_window"
+            model="ir.actions.act_window">
         <field name="name">Khám sức khỏe nhân viên</field>
     </record>
-    <record id="hr_employee_medical_examination.hr_employee_medical_examination_menu" model="ir.ui.menu">
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_menu"
+            model="ir.ui.menu">
         <field name="name">Khám sức khỏe</field>
     </record>
-    <record id="hr_employee_medical_examination.hr_employee_medical_examination_all" model="ir.ui.menu">
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_all"
+            model="ir.ui.menu">
         <field name="name">Danh sách khám sức khỏe</field>
     </record>
-    <record id="hr_employee_medical_examination.act_medical_examination_employee" model="ir.actions.act_window">
+    <record id="hr_employee_medical_examination.act_medical_examination_employee"
+            model="ir.actions.act_window">
         <field name="name">Khám sức khỏe</field>
     </record>
-    <record id="hr_employee_medical_examination.wizard_generate_medical_examination_act_window" model="ir.actions.act_window">
+    <record id="hr_employee_medical_examination.wizard_generate_medical_examination_act_window"
+            model="ir.actions.act_window">
         <field name="name">Tạo đợt khám sức khỏe</field>
     </record>
-    <record id="hr_employee_medical_examination.hr_employee_medical_examination_generate_wizard" model="ir.ui.menu">
+    <record id="hr_employee_medical_examination.hr_employee_medical_examination_generate_wizard"
+            model="ir.ui.menu">
         <field name="name">Tạo đợt khám sức khỏe</field>
     </record>
 
-    <!-- OCA: Medical Examinations stat button -->
     <record id="custom_hr_employee_vn_labels_medical_deep" model="ir.ui.view">
         <field name="name">custom.hr.employee.vn.labels.medical.deep</field>
         <field name="model">hr.employee</field>
@@ -153,7 +167,6 @@
         </field>
     </record>
 
-    <!-- OCA: Medical Examinations wizard labels -->
     <record id="custom_hr_employee_vn_labels_medical_wizard_deep" model="ir.ui.view">
         <field name="name">custom.hr.employee.vn.labels.medical.wizard.deep</field>
         <field name="model">wizard.generate.medical.examination</field>
@@ -181,7 +194,6 @@
         </field>
     </record>
 
-    <!-- OCA: Medical Examinations form/search labels -->
     <record id="custom_hr_employee_vn_labels_medical_form_deep" model="ir.ui.view">
         <field name="name">custom.hr.employee.vn.labels.medical.form.deep</field>
         <field name="model">hr.employee.medical.examination</field>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── msc.record rules ──────────────────────────────────────────────── -->
+
+    <!-- Thành viên: chỉ xem bản ghi của chính mình -->
+    <record id="rule_msc_record_user" model="ir.rule">
+        <field name="name">MSC Record: thành viên xem bản ghi của mình</field>
+        <field name="model_id" ref="model_msc_record"/>
+        <field name="groups" eval="[(4, ref('msc_performance.group_msc_user'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Quản lý: tạo và xem bản ghi của CHÍNH MÌNH (tự đánh giá) -->
+    <record id="rule_msc_record_manager_own" model="ir.rule">
+        <field name="name">MSC Record: quản lý tạo bản ghi của chính mình</field>
+        <field name="model_id" ref="model_msc_record"/>
+        <field name="groups" eval="[(4, ref('msc_performance.group_msc_manager'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Quản lý: xem bản ghi nhân viên trong department của mình -->
+    <record id="rule_msc_record_manager_department" model="ir.rule">
+        <field name="name">MSC Record: quản lý xem nhân viên trong department</field>
+        <field name="model_id" ref="model_msc_record"/>
+        <field name="groups" eval="[(4, ref('msc_performance.group_msc_manager'))]"/>
+        <field name="domain_force">[('department_id.manager_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Quản lý: xem bản ghi nhân viên report trực tiếp lên mình -->
+    <record id="rule_msc_record_manager_subordinates" model="ir.rule">
+        <field name="name">MSC Record: quản lý xem cấp dưới trực tiếp</field>
+        <field name="model_id" ref="model_msc_record"/>
+        <field name="groups" eval="[(4, ref('msc_performance.group_msc_manager'))]"/>
+        <field name="domain_force">[('report_to_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- BUL/PMO: chỉ xem phòng ban mình quản lý hoặc cấp dưới trực tiếp -->
+    <record id="rule_msc_record_bul" model="ir.rule">
+        <field name="name">MSC Record: BUL/PMO xem phòng ban của mình</field>
+        <field name="model_id" ref="model_msc_record"/>
+        <field name="groups" eval="[(4, ref('msc_performance.group_msc_bul'))]"/>
+        <field name="domain_force">['|', '|',
+            ('department_id.manager_id.user_id', '=', user.id),
+            ('report_to_id.user_id', '=', user.id),
+            ('employee_id.user_id', '=', user.id)
+        ]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Giám đốc chi nhánh: tạo bản ghi của CHÍNH MÌNH (tự đánh giá) -->
+    <record id="rule_msc_record_bul_own" model="ir.rule">
+        <field name="name">MSC Record: giám đốc chi nhánh tạo bản ghi của mình</field>
+        <field name="model_id" ref="model_msc_record"/>
+        <field name="groups" eval="[(4, ref('msc_performance.group_msc_bul'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+
+    <!-- HR Admin: toàn quyền -->
+    <record id="rule_msc_record_admin" model="ir.rule">
+        <field name="name">MSC Record: HR Admin toàn quyền</field>
+        <field name="model_id" ref="model_msc_record"/>
+        <field name="groups" eval="[(4, ref('msc_performance.group_msc_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+</odoo>

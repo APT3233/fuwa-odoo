@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Override default column visibility in task list views -->
+
+    <!-- Hide "Next Activity", hide "Time Spent", show "Personal Stage" -->
+    <record id="view_task_list_custom_columns" model="ir.ui.view">
+        <field name="name">project.task.list.custom.columns</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.project_task_view_tree_base"/>
+        <field name="arch" type="xml">
+            <!-- Hide Next Activity (was optional="show") -->
+            <field name="activity_ids" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <!-- Show Personal Stage (was optional="hide") -->
+            <field name="personal_stage_type_id" position="attributes">
+                <attribute name="optional">show</attribute>
+            </field>
+        </field>
+    </record>
+
+    <!-- Hide "Time Spent" (effective_hours optional="show" in hr_timesheet) -->
+    <record id="view_task_list_hide_timespent" model="ir.ui.view">
+        <field name="name">project.task.list.hide.timespent</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="hr_timesheet.view_task_tree2_inherited"/>
+        <field name="arch" type="xml">
+            <field name="effective_hours" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

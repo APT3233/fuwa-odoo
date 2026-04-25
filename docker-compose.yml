@@ -2,41 +2,49 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_USER: odoo
-      POSTGRES_PASSWORD: odoo
+      POSTGRES_USER: ${DB_USER:-odoo}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-odoo}
       POSTGRES_DB: postgres
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./postgres.conf:/etc/postgresql/postgresql.conf:ro
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     shm_size: 512mb   # shared memory cho PostgreSQL shared_buffers
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-odoo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   odoo:
     build: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
-      - "8069:8069"
-      - "8072:8072"   # longpolling port cho real-time notifications
+      - "${ODOO_PORT:-8069}:8069"
+      - "${ODOO_LONGPOLL_PORT:-8072}:8072"
     volumes:
       - .:/opt/odoo
       - odoo-data:/var/lib/odoo
     # --- PRODUCTION (nhiều người dùng) ---
     # Bỏ comment khi chuyển sang Linux server
-    # command: ["python", "odoo-bin", "-d", "odoo19",
+    # command: ["python", "odoo-bin", "-d", "${DB_NAME:-odoo19}",
     #   "--workers=4", "--max-cron-threads=1",
     #   "--limit-memory-hard=2684354560", "--limit-memory-soft=2147483648",
     #   "--limit-time-cpu=600", "--limit-time-real=1200",
-    #   "--db-filter=^odoo19$$", "--data-dir=/var/lib/odoo",
+    #   "--db-filter=^${DB_NAME:-odoo19}$$", "--data-dir=/var/lib/odoo",
     #   "--addons-path=/opt/odoo/addons,/opt/odoo/odoo/addons,/opt/odoo/custom_addons,/opt/odoo/oca_addons",
-    #   "--db_host=db", "--db_port=5432", "--db_user=odoo", "--db_password=odoo",
+    #   "--db_host=db", "--db_port=5432",
+    #   "--db_user=${DB_USER:-odoo}", "--db_password=${DB_PASSWORD:-odoo}",
     #   "--proxy-mode"]
     # --- DEVELOPMENT (hiện tại) ---
-    command: ["python", "odoo-bin", "-d", "odoo19",
+    command: ["python", "odoo-bin", "-d", "${DB_NAME:-odoo19}",
       "--workers=0",
-      "--db-filter=^odoo19$$", "--data-dir=/var/lib/odoo",
+      "--db-filter=^${DB_NAME:-odoo19}$$", "--data-dir=/var/lib/odoo",
       "--addons-path=/opt/odoo/addons,/opt/odoo/odoo/addons,/opt/odoo/custom_addons,/opt/odoo/oca_addons",
-      "--db_host=db", "--db_port=5432", "--db_user=odoo", "--db_password=odoo"]
+      "--db_host=db", "--db_port=5432",
+      "--db_user=${DB_USER:-odoo}", "--db_password=${DB_PASSWORD:-odoo}"]
 
 volumes:
   db-data:

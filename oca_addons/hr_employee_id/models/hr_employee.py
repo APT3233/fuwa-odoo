@@ -20,13 +20,11 @@ class HrEmployee(models.Model):
 
     identification_id = fields.Char(string="Identification No", copy=False)
 
-    _sql_constraints = [
-        (
-            "identification_id_uniq",
-            "unique(identification_id)",
-            "The Employee Number must be unique across the company(s).",
-        ),
-    ]
+    # Odoo 19: _sql_constraints deprecated → dùng models.Constraint
+    _identification_id_uniq = models.Constraint(
+        "unique(identification_id)",
+        "The Employee Number must be unique across the company(s).",
+    )
 
     @api.model
     def _generate_identification_id(self):

@@ -37,7 +37,14 @@ class CustomHrTerminateEmployeeWizard(models.TransientModel):
 
     def action_confirm(self):
         self.ensure_one()
-        self.employee_id.write({
+        employee = self.employee_id
+
+        # Ghi lịch sử nghỉ việc trước khi deactivate
+        employee._create_work_history_entry(
+            change_reason="resign",
+            note=self.departure_description or f"Nghỉ việc ngày {self.departure_date}",
+        )
+        employee.with_context(skip_work_history=True).write({
             "employment_status": "terminated",
             "active": False,
             "departure_reason_id": self.departure_reason_id.id,
